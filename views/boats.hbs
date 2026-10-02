@@ -270,7 +270,7 @@
 
 				{{!-- <form id="boats_search_form" action="/boats" method="post"> --}}
 					<form id="boats_search_form" action="/{{paginateUrl}}" method="post">
-						<input type="hidden" name="sort_by" value="publish_date">
+						<input type="hidden" name="sort_by" value="{{session.sort_by}}">
 						<input type="hidden" class="boat_filter" id="boat_name_val" name="boat_name_val"
 							value="{{session.boat_name_val}}">
 						<input type="hidden" class="boat_filter" id="location_val" name="location_val"

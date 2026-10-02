@@ -77,17 +77,16 @@ $(document).ready(function () {
 });
 
 // ---------------------------------------------------------------------------
-// Sort dropdown — uses refreshInventory() (AJAX) not form submit,
-// keeping filter state without a full page reload.
-// Both the desktop header select (#mobile-boat_search_filter) and the
-// mobile sidebar select (#boat_search_filter) sync each other then refresh.
+// Sort dropdown — copied exactly from reference custom.js lines 681-688
+// Sets sort_by hidden input then does a FULL FORM SUBMIT (page reload).
+// This is intentional: reference repo uses form submit not AJAX for sort
+// because sort order is stored in session and applied server-side.
+// Both selects (#boat_search_filter in mobile sidebar,
+//              #mobile-boat_search_filter in desktop listing header) trigger this.
 // ---------------------------------------------------------------------------
 $(document).on('change', '#boat_search_filter, #mobile-boat_search_filter', function () {
-    var val = $(this).val();
-    // Keep both selects in sync
-    $('#boat_search_filter, #mobile-boat_search_filter').val(val);
-    $('input[name="sort_by"]').val(val);
-    refreshInventory();
+    $('input[name="sort_by"]').val(this.value);
+    document.getElementById('boats_search_form').submit();
 });
 
 // ---------------------------------------------------------------------------
