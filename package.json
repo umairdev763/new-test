@@ -1,0 +1,28 @@
+{
+  "name": "new-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "concat-stream": "^2.0.0",
+    "connect-mongodb-session": "^5.0.0",
+    "express": "^5.2.1",
+    "express-handlebars": "^9.0.1",
+    "express-session": "^1.19.0",
+    "hbs": "^4.3.1",
+    "mongodb": "^7.7.0",
+    "request": "^2.88.2",
+    "xml2js": "^0.6.2"
+  }
+}

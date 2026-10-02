@@ -1,0 +1,387 @@
+ 
+
+ @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+
+  :root {
+    --primary-color: #F17705;
+  }
+   
+  /* ------------------------++++++++++++++++++------------------------*/
+  
+  /* Common css start here  */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 0;
+  }
+  
+  address {
+    margin-bottom: 0;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: none;
+  }
+  
+  p {
+    margin-bottom: 0;
+  }
+  
+  ul {
+    padding-left: 0;
+  }
+
+  /* user page starat here */
+
+
+  .user-container{
+    padding-left: 125px;
+  }
+
+  .user-top-sec{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F4F4F4;
+    padding: 0 110px;
+    height: 123px;
+    margin-bottom: 30px;
+  }
+  .user-heading h1{
+    color: #000;
+    font-family: Lato;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: capitalize;
+  }
+  .user-heading h1 span{
+    margin-right: 25px;
+    font-size: 45px;
+  }
+  .user-top-btn-sec{
+    display: flex;
+    gap: 40px;
+  }
+.top-list{
+    position: relative;
+}
+  .top-list p{
+    color: #000;
+    text-align: center;
+    font-family: Mulish;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    text-transform: capitalize;
+    cursor: pointer;
+  }
+  .top-list span{
+    margin-left: 10px;
+  }
+  .top-main-list{
+    position: absolute;
+    top: 30px;
+    left: -15px;
+    background: #F4F4F4;
+    width: 190px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: none;
+  }
+  .top-main-list ul{
+    padding: 0 15px;
+  }
+  .top-main-list li{
+    list-style: none;
+    line-height: 35px;
+    font-family: Mulish;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+  }
+  .top-main-list li a{
+    color: #000;
+  }
+  .top-main-list li a:hover{
+    color: #000;
+  }
+  .view-site-btn{
+    border-radius: 40px;
+    background: #F17705;
+    padding: 10px 31px;
+    color: #FFF;
+    text-align: center;
+    font-family: Mulish;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: capitalize;
+  }
+  .view-site-btn:hover{
+    color: #FFF;
+  }
+  .user-inner-container{
+    display: flex;
+    padding: 0 110px;
+    margin-top: 40px;
+  }
+  .pagingWrap{
+    padding: 0 110px;
+    margin-top: 20px;
+  }
+  .pagingWrap a{
+    color: #000;
+    display: inline-block;
+  }
+  .pagingWrap a i{
+    display: inline-block;
+    margin: 0 5px;
+  }
+  .pagingWrap a + a{
+    margin-left: 5px;
+  }
+  .user-inner-column-1{
+    flex-basis: 80%;
+  }
+  .user-inner-column-2{
+    flex-basis: 20%;
+  }
+
+  .abd-card{
+    border-radius: 10px;
+    border: 1px solid #D9D9D9;
+    margin-top: 40px;
+    padding: 0 15px;
+  }
+  .abd-card th, .abd-card td{
+    height: 58px;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #EEE !important;
+    cursor: pointer;
+  }
+  .abd-name-cell p:nth-child(1){
+    color: #000;
+    font-family: Mulish;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  .abd-name-cell p:nth-child(2){
+    color: #7A7A7A;
+    font-family: Mulish;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  .abd-new-user-btn{
+    color: #FFF;
+    text-align: center;
+    font-family: Mulish;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: capitalize;
+    border-radius: 10px;
+    background: #222;
+    width: 250px;
+    height: 80px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .abd-new-user-btn:hover{
+    color: #FFF;
+  }
+  .abd-btn-box{
+    margin-top: 40px;
+    text-align: right;
+  }
+
+  /* user details page */
+
+  .abd-details-card{
+    display: flex;
+    border-radius: 10px;
+    border: 1px solid #D9D9D9;
+    padding: 20px 30px;
+    gap: 40px;
+  }
+  .details-card-column-1{
+    flex-basis: 80%;
+  }
+  .details-card-column-2{
+    flex-basis: 33.33%;
+  }
+  .abd-box-row{
+    display: flex;
+    gap: 40px;
+  }
+ 
+  .abd-card-group{
+    width: 50%;
+  }
+  .abd-card-group label{
+    color: #000;
+    font-family: Mulish;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    margin-bottom: 10px;
+  }
+  .abd-card-group{
+    margin-bottom: 20px;
+  }
+  .abd-card-group .abd-input-box{
+    width: 100%;
+    height: 40px;
+    border: 1px solid #DDD;
+    background: #F9F9F9;
+    color: #000;
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 0 20px;
+  }
+  .abd-card-group .abd-input-box::placeholder{
+    color: #000;
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  .abd-card-group .abd-input-box:focus{
+    outline: none;
+    box-shadow: none;
+  }
+  .abd-btn-row{
+    display: flex;
+    max-width: 310px;
+    gap: 10px;
+  }
+.abd-btn-label label{
+    color: #000;
+    font-family: Mulish;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    margin-bottom: 10px;
+}
+.abd-btn-box-sec{
+    margin-bottom: 20px;
+}
+.abd-edit-btn{
+    width: 150px;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid #DDD;
+    background: #F9F9F9;
+    color: rgba(0, 0, 0, 0.50);
+    text-align: center;
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    padding: 10px 0px;
+    line-height: 17px;
+    text-align: center;
+    display: inline-block;
+    transition: all 0.5s;
+}
+.abd-edit-btn i.fa{
+    margin-left: 8px;
+    color: #F17705;
+}
+.abd-edit-btn:hover{
+    color: rgba(0, 0, 0, 0.50);
+}
+  .abd-action-btn{
+    width: 150px;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid #DDD;
+    background: #F9F9F9;
+    color: rgba(0, 0, 0, 0.50);
+    text-align: center;
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 17px;
+    padding: 10px 31px;
+    display: inline-block;
+    transition: all 0.5s;
+  }
+  .abd-action-btn:hover{
+    color: rgba(0, 0, 0, 0.50);
+  }
+
+  .abd-active{
+    background: #F17705;
+    color: #FFF;
+    border: 1px solid #F17705;
+  }
+  .abd-active:hover{
+    color: #FFF !important;
+  }
+  .abd-active-success{
+    background: #008A1E;
+    color: #FFF;
+    border: 1px solid #008A1E;
+  }
+
+  .abd-active-success:hover{
+    color: #FFF !important;
+  }
+  .abd-active-danger{
+    background: #BA000033;
+    color: #BA0000;
+    border: 1px solid #BA000033;
+  }
+  .abd-active-danger:active{
+    color: #BA0000;
+  }
+  .abd-select-group{
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .abd-select-group .abd-input-box{
+    width: 100%;
+    height: 40px;
+    border: 1px solid #DDD;
+    background: #F9F9F9;
+    color: #000;
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 0 20px;
+  }
+  select:focus{
+    outline: none;
+    box-shadow: none;
+  }

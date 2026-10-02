@@ -1,0 +1,639 @@
+<style>
+	#series_link-filter a {
+		font-weight: 300;
+		margin-bottom: 5px;
+		color: #a3a2a2;
+		display: block;
+		text-align: left;
+		margin-left: 14px;
+	}
+
+	.boatDetail h2 {
+		color: #000000;
+		font-size: 21px !important;
+		font-weight: 700;
+		margin-top: 0;
+		margin-bottom: 10px;
+	}
+
+	.breadcrumb-item.active a {
+		color: #6c757d;
+		text-transform: capitalize;
+	}
+	.sub-header{
+		display: none;
+	}
+</style>
+<script>window.FILTER_DEFS = {{{filterDefs}}};</script>
+<div class="loader-wrapper">
+	<div class="loader"></div>
+</div>
+
+<section class="BoatsLising mt-5">
+	<div class="top_new_filter">
+		<div class="inner_wrap_filter">
+			{{!-- <div class="left_btn">
+				<a class="btn filter_btn opeN_clik" href="javascript:void(0)" data-direction='bottom' title="Sortby">
+					<img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/fiter-icon.png" class="pr-2" alt="{{imgAlt 'boats-fiter-icon' 'Fiter Icon'}}" data-alt-key="boats-fiter-icon">Recent ... <span><i
+							class="fa fa-angle-down" aria-hidden="true"></i></span></a>
+			</div> --}}
+			<div class="right_bt">
+				<div class="inner_wrap_bt sortby-btn">
+					<a href="javascript:void(0)" class="opeN_clik" title="Sortby">
+						<img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/fiter-icon.png" class="pr-2" alt="{{imgAlt 'boats-sort-filter-icon' 'Sort and Filter'}}" data-alt-key="boats-sort-filter-icon">Recent ... 
+						<span>
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</span>
+					</a>
+				</div>
+
+				{{!-- <div class="inner_wrap_bt">
+					<a href="javascript:void(0)" class="opeN_clik" title="Sortby">SORT BY <span></span></a>
+				</div> --}}
+
+				{{#each filterPanels}}
+				<div class="inner_wrap_bt">
+					<a href="javascript:void(0)" class="opeN_clik" title="{{this.key}}">{{this.label}} <span class="selected-count"></span></a>
+				</div>
+				{{/each}}
+			</div>
+		</div>
+	</div>	
+
+	{{!-- <div class="breadcrumb-container">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				<li class="breadcrumb-item active" aria-current="page"><a
+						href="{{paginateUrl}}">Listings</a></li>
+			</ol>
+		</nav>
+	</div> --}}
+
+	<div class="listing-container">
+		<div class="fitler-col filtersWrapper">
+			<div class="filterInner">
+				<div class="filterBox ">
+					<h2>Applied Filters</h2>
+					<div class="sidWidget">
+						<div class="sidWidget_iner">
+							<ul class="youSearchList">
+							</ul>
+						</div>
+					</div>
+				</div>
+				{{!-- //Mobile code --}}
+				<div class="sidWidget af-disp-mob  inner_wrap_left_options">
+					<div class="sidWidget_iner mobile-filter-main-box top_des_fil">
+
+						<div class="mobile-filter-box mobile-sort-by" id="Sortby">
+							<button id="sort" class="filter-accordion-header faq0">SORT BY<i
+									class="fa fa-xmark close-filter"></i></button>
+							<div class="filter-accordion-content">
+								<div class="sortWrapper ">
+									<label for="">Sort By</label>
+									<select id="boat_search_filter" aria-labelledby="SortByLabel" class="form-control">
+										<option {{#ifCond session.sort_by '==' 'length-shortest_to_longest' }}
+											selected="selected" {{/ifCond}} value="length-shortest_to_longest">Length -
+											Shortest to Longest</option>
+										<option {{#ifCond session.sort_by '==' 'year-newest_to_oldest' }}
+											selected="selected" {{/ifCond}} value="year-newest_to_oldest">Year - Newest
+											to Oldest</option>
+										<option {{#ifCond session.sort_by '==' 'year-oldest_to_newest'
+											}}selected="selected" {{/ifCond}} value="year-oldest_to_newest">Year -
+											Oldest to Newest</option>
+										<option {{#ifCond session.sort_by '==' 'price-high_to_low' }}selected="selected"
+											{{/ifCond}} value="price-high_to_low">Price - High to Low</option>
+										<option {{#ifCond session.sort_by '==' 'price-low_to_high' }}selected="selected"
+											{{/ifCond}} value="price-low_to_high">Price - Low to High</option>
+
+									</select>
+
+
+								</div>
+							</div>
+						</div>
+
+						{{#each filterPanels}}
+						{{!-- Mobile checkbox filter panel --}}
+						{{#ifCond this.type '==' 'checkbox'}}
+						<div class="mobile-filter-box" id="{{this.key}}">
+							<button class="filter-accordion-header">{{this.label}}<i class="fa fa-xmark close-filter"></i></button>
+							<div class="filter-accordion-content">
+								<div id="{{this.key}}-filter-mob">
+									{{#if this.hasAll}}
+									<div class="sqr-checkBox">
+										<label id="{{this.key}}_all">
+											<input type="checkbox" aria-labelledby="{{this.key}}_all"
+												onchange="filterCheckboxSelected('{{this.key}}', this)"
+												name="{{this.checkboxName}}" autocomplete="off" value="all"
+												{{#if this.allChecked}}checked="checked"{{/if}}>
+											<span class="filter-checkbox">
+												<i class="fa fa-square-o" aria-hidden="true"></i>
+												<i class="fa fa-square" aria-hidden="true"></i>
+											</span>
+											All <span class="filter_count"></span>
+										</label>
+									</div>
+									{{/if}}
+									{{#each this.items}}
+									<div class="sqr-checkBox">
+										<label id="{{../key}}_{{this._id}}">
+											<input type="checkbox" aria-labelledby="{{../key}}_{{this._id}}"
+												onchange="filterCheckboxSelected('{{../key}}', this)"
+												class="{{../key}} {{this._id}}"
+												name="{{../checkboxName}}" autocomplete="off"
+												value="{{this._id}}"
+												{{#if this.checked}}checked="checked"{{/if}}>
+											<span class="filter-checkbox">
+												<i class="fa fa-square-o" aria-hidden="true"></i>
+												<i class="fa fa-square" aria-hidden="true"></i>
+											</span>
+											{{this._id}} <span class="filter_count">({{this.count}})</span>
+										</label>
+									</div>
+									{{/each}}
+								</div>
+							</div>
+						</div>
+						{{/ifCond}}
+						{{!-- Mobile range filter panel --}}
+						{{#ifCond this.type '==' 'range'}}
+						<div class="mobile-filter-box range-slider-box" id="{{this.key}}">
+							<button class="filter-accordion-header">{{this.label}}<i class="fa fa-xmark close-filter"></i></button>
+							<div class="filter-accordion-content">
+								<label for="{{this.key}}"><i hidden>{{this.label}}</i></label>
+								<input type="text" id="{{this.mobDisplayId}}" aria-label="{{this.label}}" readonly />
+								<div id="{{this.mobRangeId}}"></div>
+								<div class="range-value-box" style="margin-top: 10px;">
+									<div class="range-box-item" style="display: inline-block; margin-right: 10px;">
+										<span>Min</span>
+										<span id="{{this.mobMinId}}"></span>
+									</div>
+									-
+									<div class="range-box-item" style="display: inline-block; margin-left: 10px;">
+										<span>Max</span>
+										<span id="{{this.mobMaxId}}"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+						{{/ifCond}}
+						{{/each}}
+
+						<div class="bottom_btn d-none d-lg-block">
+							<a href="javascript:void(0)"></a>
+							{{!-- <a href="javascript:void(0)" id="updteRslt">Show {{results.length}} Results</a> --}}
+						</div>
+					</div>
+				</div>
+
+				<div class="desktop_dis">
+					{{#each filterPanels}}
+					{{!-- Desktop checkbox filter panel --}}
+					{{#ifCond this.type '==' 'checkbox'}}
+					<div class="form-gruop filterOptions">
+						<div class="desktop-accordion-header">
+							<h4>{{this.label}}</h4>
+							<span class="fa fa-minus"></span>
+						</div>
+						<div id="{{this.key}}-filter" class="filterList">
+							{{#if this.hasAll}}
+							<div class="sqr-checkBox">
+								<label id="{{this.key}}_all">
+									<input type="checkbox" class="styled-checkbox"
+										onchange="filterCheckboxSelected('{{this.key}}', this)"
+										name="{{this.checkboxName}}" autocomplete="off" value="all"
+										{{#if this.allChecked}}checked="checked"{{/if}}>
+									<span class="filter_count"> All </span>
+								</label>
+							</div>
+							{{/if}}
+							{{#each this.items}}
+							<div class="sqr-checkBox">
+								<label id="{{../key}}_{{this._id}}">
+									<input type="checkbox" aria-labelledby="{{../key}}_{{this._id}}"
+										onchange="filterCheckboxSelected('{{../key}}', this)"
+										class="{{../key}} {{this._id}} styled-checkbox"
+										name="{{../checkboxName}}" autocomplete="off"
+										value="{{this._id}}"
+										{{#if this.checked}}checked="checked"{{/if}}>
+									<span class="filter_count"> {{this._id}} </span>
+								</label>
+							</div>
+							{{/each}}
+						</div>
+					</div>
+					{{/ifCond}}
+					{{!-- Desktop range filter panel --}}
+					{{#ifCond this.type '==' 'range'}}
+					<div class="form-gruop filterOptions">
+						<div class="desktop-accordion-header">
+							<h4>{{this.label}}</h4>
+							<span class="fa fa-minus"></span>
+						</div>
+						<div class="filterList">
+							<div id="{{this.rangeId}}"></div>
+							<input type="text" id="{{this.displayId}}" aria-label="{{this.label}}"
+								data-min={{this.minValue}} data-max={{this.maxValue}}
+								data-filter="0" readonly
+								style="border:0; color:#606060; font-family:Montserrat-regular; font-weight:bold; text-align:center;">
+							<div class="range-value-box">
+								<div class="range-box-item">
+									<span>Min</span>
+									<span id="{{this.minValId}}">{{this.minValue}}</span>
+								</div>
+								-
+								<div class="range-box-item">
+									<span>Max</span>
+									<span id="{{this.maxValId}}">{{this.maxValue}}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					{{/ifCond}}
+					{{/each}}
+					<div class="clearfix"></div>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+
+		</div>
+
+		<div class="listing-content-col">
+
+			<div class="boatsListingWrapper">
+
+
+				<input type="hidden" name="listing_page_slug" id="paginateUrl" value="{{paginateUrl}}">
+				<input type="hidden" name="total_units" value="{{results.length}}">
+
+				{{!-- <form id="boats_search_form" action="/boats" method="post"> --}}
+					<form id="boats_search_form" action="/{{paginateUrl}}" method="post">
+						<input type="hidden" name="sort_by" value="publish_date">
+						<input type="hidden" class="boat_filter" id="boat_name_val" name="boat_name_val"
+							value="{{session.boat_name_val}}">
+						<input type="hidden" class="boat_filter" id="location_val" name="location_val"
+							value="{{session.location_val}}">
+						<input type="hidden" class="boat_filter" id="boat_type_val" name="boat_type_val"
+							value="{{session.boat_type_val}}">
+						{{#each filterPanels}}
+						<input type="hidden" class="boat_filter" id="{{this.hiddenId}}" name="{{this.hiddenId}}"
+							value="{{lookup ../session this.hiddenId}}">
+						{{/each}}
+						<input style="display: none;" type="submit" name="boats_search_form_submit" value="1">
+					</form>
+
+					{{!-- SEO Filter URL Data --}}
+					<input type="hidden" id="inventory_base_path" value="{{basePath}}" />
+					<input type="hidden" id="inventory_location" value="{{locationSlug}}" />
+					<input type="hidden" id="inventory_location_slugs" value="{{locationSlugs}}" />
+
+
+
+					
+					<div class="listing-header">
+
+						<h1 class="boatsHeading">{{pageTitle}}</h1>
+
+						<div class="listing-header-right-box">
+							<div class="lisitng-search-box" style="position: relative;">
+								<span class="fa fa-search"></span>
+								<input type="text" placeholder="Search" name="boat_search" class="form-control filter-search-box boat-search-listing" value="{{ search_word }}">
+								{{#if search_word}}
+								<span class="fa fa-times clear-listing-search" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a3a2a2; z-index: 5;"></span>
+								{{/if}}
+							</div>
+							<div class="sortWrapper">
+							<label for="">Sort By</label>
+							<select id="mobile-boat_search_filter" aria-labelledby="SortByLabel" class="form-control">
+
+								<option {{#ifCond session.sort_by '==' 'year-newest_to_oldest' }} selected="selected"
+									{{/ifCond}} value="year-newest_to_oldest">Year - Newest First</option>
+
+								<option {{#ifCond session.sort_by '==' 'year-oldest_to_newest' }} selected="selected"
+									{{/ifCond}} value="year-oldest_to_newest">Year - Oldest First</option>
+
+								<option {{#ifCond session.sort_by '==' 'length-longest_to_shortest' }}
+									selected="selected" {{/ifCond}} value="length-longest_to_shortest">Length - Longest
+									First</option>
+
+								<option {{#ifCond session.sort_by '==' 'length-shortest_to_longest' }}
+									selected="selected" {{/ifCond}} value="length-shortest_to_longest">Length - Shortest
+									First</option>
+								
+								<option {{#ifCond session.sort_by '==' 'price-high_to_low' }} selected="selected"
+									{{/ifCond}} value="price-high_to_low">Price - High to Low</option>
+
+								<option {{#ifCond session.sort_by '==' 'price-low_to_high' }} selected="selected"
+									{{/ifCond}} value="price-low_to_high">Price - Low to High</option>
+
+							</select>
+
+							</div>
+
+							<div class="toggler-button-box">
+								<span class="grid-view-btn toggleViewBtn">
+									<img class="white-btn" style="display: none;"
+										src="https://cdn.mdsbrand.com/madis/assets/images/listing images/grid-view-icon.png" alt="{{imgAlt 'boats-grid-view-icon' 'Grid View'}}" data-alt-key="boats-grid-view-icon">
+									<img class="black-btn-sec" src="https://cdn.mdsbrand.com/madis/assets/images/listing images/grid-view-icon-black.png"
+										alt="{{imgAlt 'boats-grid-view-icon' 'Grid View'}}" data-alt-key="boats-grid-view-icon">
+								</span>
+								<span class="list-view-btn toggleViewBtn active">
+									<img class="black-btn-sec" style="display: none;"
+										src="https://cdn.mdsbrand.com/madis/assets/images/listing images/list-view-icon.png" alt="{{imgAlt 'boats-list-view-icon' 'List View'}}" data-alt-key="boats-list-view-icon">
+									<img class="white-btn" src="https://cdn.mdsbrand.com/madis/assets/images/listing images/list-view-icon-white.png"
+										alt="{{imgAlt 'boats-list-view-icon' 'List View'}}" data-alt-key="boats-list-view-icon">
+								</span>
+							</div>
+						</div>
+					</div>
+					
+					<div class="listings-count">
+						<p id="updteRslt">{{totalProductCount}} Listings</p>
+					</div>
+
+					<div class="text-center my-5 filtersWrapper zero-inventory"
+						style="padding:20px; {{#ifCond results.length '>' 0}}display:none;{{/ifCond}}">
+						<h2 class="mb-3">Sorry, no matches found for your search</h2>
+						<p class="mb-4" style="font-size: 30px; font-weight:100">Try widening your search or explore
+							other available boats below.</p>
+					</div>
+					<div class="clearfix"></div>
+					<div class="boatsListing">
+						<div class="container-fluid">
+							<div id="boats-list" class="row">
+								{{#each results}}
+								<div class="boat-card list-view">
+
+									<div class="boat-img-box">
+
+										<a href="/{{#ifCond boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-pre-owned-boats-for-sale-detail{{/ifCond}}/{{boatPermalink}}">
+											<img src="{{#if productImage}}{{productImage}}{{else}}https://cdn.mdsbrand.com/madis/assets/images/no_image_available.jpg{{/if}}" class="boat-img" alt="{{imgAlt 'boats-if' 'If'}}">
+										</a>
+										{{#if this.note}}
+										<span class="item_badge" style="position: absolute;right: 12px;top: 1%;"><a
+												href="javascript:void(0)">{{this.note}}</a></span>
+										{{/if}}
+
+									</div>
+
+									<div class="boat-content-box">
+										<div class="upper-content-box">
+
+											<div class="sm-box-1">
+
+												{{#ifCond this.boat_condition '==' 'New'}}
+												<h2 class="boat-title">
+													<a
+														href="/new-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+												</h2>
+												{{/ifCond}}
+
+												{{#ifCond this.boat_condition '==' 'Used'}}
+												<h2 class="boat-title">
+													<a
+														href="/used-pre-owned-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+												</h2>
+												{{/ifCond}}
+
+												{{!-- <div class="lisitng-note">
+													<span>Boats</span>
+												</div> --}}
+
+												<div class="boat-condition-box">
+													<ul class="boat-condition-list">
+
+														{{#if this.boat_condition}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-1.png"
+																alt="{{imgAlt 'boats-listing-condition-icon' 'Condition'}}" data-alt-key="boats-listing-condition-icon"> Condition: <span> {{this.boat_condition}}</span>
+														</li>
+														{{/if}}
+														{{#if this.boat_length}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-1.png"
+																alt="{{imgAlt 'boats-listing-length-icon' 'Boat Length'}}" data-alt-key="boats-listing-length-icon">Length: <span> {{this.boat_length}}'</span></li>
+														{{/if}}
+
+														{{#if this.stock_number}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img"
+																alt="{{imgAlt 'boats-listing-stock-icon' 'Stock Number'}}" data-alt-key="boats-listing-stock-icon">Stock #: <span> {{this.stock_number}}</span></li>
+														{{/if}}
+
+														{{#if this.engine_hours}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+																alt="{{imgAlt 'boats-listing-hours-icon' 'Engine Hours'}}" data-alt-key="boats-listing-hours-icon">Hours: <span> {{this.engine_hours}} hrs</span></li>
+
+														{{/if}}
+
+														{{#if this.hullId}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img"
+																alt="Hull ID">Serial: <span> {{this.hullId}}</span></li>
+														{{/if}}
+
+
+
+													</ul>
+												</div>
+
+
+
+											</div>
+
+											<div class="sm-box-2">
+												<div class="pricing-box">
+
+													<div class="price-per-month">
+
+														{{#if this.boatPrice}}
+														<h3 class="card-text">${{thousandSeprator this.boatPrice}}</h3>
+														{{else}}
+														<h3 class="card-text">Request Pricing</h3>
+														{{/if}}
+
+														<div>
+															{{#ifCond this.boat_condition '==' 'New'}}
+															<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}"
+																class="listing-blue-btn">VIEW DETAILS</a>
+															{{/ifCond}}
+
+
+															{{#ifCond this.boat_condition '==' 'Used'}}
+															<a href="/used-pre-owned-boats-for-sale-detail/{{this.boatPermalink}}"
+																class="listing-blue-btn">VIEW DETAILS</a>
+															{{/ifCond}}
+
+															<a href="javascript:void(0)" class="listing-skyblue-btn">GET PRE-aPPROVED</a>
+														</div>
+
+													</div>
+
+												</div>
+											</div>
+
+
+										</div>
+
+
+										{{#if boatDescription}}
+										<div class="bottom-content-box">
+											<div class="desc-box">
+												<h3>DESCRIPTION</h3>
+												<div class="listing-desc">{{{this.boatDescription}}}
+
+													{{#ifCond this.boat_condition '==' 'New'}}
+													<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}"
+														class="read-more">MORE BOAT DETAILS</a>
+													{{/ifCond}}
+
+													{{#ifCond this.boat_condition '==' 'Used'}}
+													<a href="/used-pre-owned-boats-for-sale-detail/{{this.boatPermalink}}"
+														class="read-more">MORE BOAT DETAILS</a>
+													{{/ifCond}}
+
+												</div>
+											</div>
+										</div>
+
+										{{/if}}
+
+									</div>
+
+	
+								</div>
+								{{/each}}
+
+								{{#each results}}
+
+								<div class="grid-boat-card grid-view">
+
+									<div class="grid-boat-img-box">
+
+										<a href="/{{#ifCond boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-pre-owned-boats-for-sale-detail{{/ifCond}}/{{boatPermalink}}">
+											<img src="{{#if productImage}}{{productImage}}{{else}}https://cdn.mdsbrand.com/madis/assets/images/no_image_available.jpg{{/if}}" class="boat-img" alt="{{imgAlt 'boats-if-2' 'If'}}">
+										</a>
+										{{#if this.note}}
+										<span class="item_badge" style="position: absolute;right: 12px;top: 1%;"><a
+												href="javascript:void(0)">{{this.note}}</a></span>
+										{{/if}}
+
+									</div>
+
+									<div class="grid-boat-content-box">
+										<div class="grid-upper-content-box">
+
+											<div class="grid-sm-box-1">
+
+												{{#ifCond this.boat_condition '==' 'New'}}
+												<h2 class="grid-boat-title">
+													<a
+														href="/new-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+												</h2>
+												{{/ifCond}}
+
+												{{#ifCond this.boat_condition '==' 'Used'}}
+												<h2 class="grid-boat-title">
+													<a
+														href="/used-pre-owned-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+												</h2>
+												{{/ifCond}}
+
+												<div class="grid-boat-condition-box">
+
+													<div class="grid-price-box">
+														{{#if this.boatPrice}}
+														<ul>
+															
+															<li class="grid-price-item">${{thousandSeprator this.boatPrice}}</li>
+															{{!-- {{else}}
+															<li class="grid-price-item">Request Pricing</li> --}}
+														
+															<li class="grid-price-item">${{CalculatePaymentFromBoatPrice this.boatPrice}}/mo*</li>
+															
+														</ul>
+
+															{{else}}
+
+															{{#ifCond this.boat_condition '==' 'New'}}
+
+																<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+
+															{{/ifCond}}
+
+															{{#ifCond this.boat_condition '==' 'Used'}}
+
+																<a href="/used-pre-owned-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+
+															{{/ifCond}} 
+
+														{{/if}}
+													</div>
+													<ul class="grid-boat-condition-list">
+
+														{{#if this.boat_condition}}
+														<li class="specs-list-item"> <img
+																src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/condition.png"
+																alt="{{imgAlt 'boats-grid-condition-icon' 'Condition'}}" data-alt-key="boats-grid-condition-icon"> {{this.boat_condition}}</li>
+														{{/if}}
+														{{#if this.boat_length}}
+														<li class="specs-list-item"> <img
+																src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-1.png"
+																alt="{{imgAlt 'boats-grid-length-icon' 'Boat Length'}}" data-alt-key="boats-grid-length-icon"> {{this.boat_length}}'</li>
+														{{/if}}
+														{{#if this.engine_hours}}
+														<li class="specs-list-item"><img
+																src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+																alt="{{imgAlt 'boats-grid-hours-icon' 'Engine Hours'}}" data-alt-key="boats-grid-hours-icon"> {{this.engine_hours}} hrs</li>
+														{{/if}}
+														{{#if this.hullId}}
+														<li class="specs-list-item"><img
+																src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img"
+																alt="Hull ID">{{this.hullId}}</li>
+														{{/if}}
+														{{!-- {{#if this.stock_number}}
+														<li class="specs-list-item"><img
+																src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/stock-no.png" class="stock-img"
+																alt="{{imgAlt 'boats-stock-no' 'Stock No'}}" data-alt-key="boats-stock-no"> {{this.stock_number}} </li>
+														{{/if}} --}}
+
+
+													</ul>
+												</div>
+
+											</div>
+
+										</div>
+
+									</div>
+
+									<div class="carouselDotsWrap">
+										<span class="carouselCutomDots"></span>
+										<span class="carouselCutomDots"></span>
+										<span class="carouselCutomDots"></span>
+									</div>
+
+								</div>
+
+								{{/each}}
+
+							</div>
+						</div>
+
+						<div class="lastLoad_btn text-center" id="loadMore_pag">
+
+							{{#ifCond pageCount '>' 0}}
+							{{#ifCond current_page '!=' pageCount}}
+							<button data-ajax_url="/{{paginateUrl}}?load_more=1" data-current_page="{{current_page}}"
+								data-page_count="{{pageCount}}" class="load_more_action boat_load_btn hk1">
+								LOAD MORE
+							</button>
+
+							{{/ifCond}}
+							{{/ifCond}}
+						</div>
+
+
+					</div>
+			</div>
+		</div>
+	</div>
+</section>

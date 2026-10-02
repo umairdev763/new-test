@@ -1,0 +1,453 @@
+	<header class="for-desktop">
+		<nav>
+			<div class="container-fluid px-5 py-3 nav-parent">
+				<div class="row align-items-center">
+					<div class="col-md-2">
+						<div class="nav-logo">
+							<a href="/"><img src="https://cdn.mdsbrand.com/resize/mean-idaho-staging/assets/images/logo-new.png?w=240&format=webp" alt="{{imgAlt 'front-menu-logo' 'Logo'}}" data-alt-key="front-menu-logo"></a>
+						</div>
+					</div>
+					<div class="col-md-8">
+						<ul class="nav-list">
+							<li class="hover-class"><a href="javascript:(void)" class="boats-menu">BOATS</a></li>
+							<li class="hover-class"><a href="javascript:(void)" class="service-menu">SERVICES &amp; DOCKS</a></li>
+							<li class="hover-class"><a target="_blank" href="https://buywakeworks.com/">SHOP GEAR</a></li>
+							<li class="hover-class"><a href="/contact-us-new-used-boat-sales-service-parts">LOCATIONS</a></li>
+							<li class="hover-class nav-dropdown">
+								<a href="javascript:(void)" class="community-menu">OUR COMMUNITY</a>
+								<ul class="nav-submenu">
+									<li><a href="/about-us-boat-sales-service-parts-rentals-storage-idaho">About Us</a></li>
+									<li><a href="/events-idahotwatersports">Events</a></li>
+									<li><a href="/blogs">Blog</a></li>
+									<li><a href="/award-and-achievements">Awards &amp; Achievements</a></li>
+								</ul>
+							</li>
+							<li class="hover-class"><a href="/contact-us-new-used-boat-sales-service-parts">CONTACT US</a></li>
+							<li style="padding-left: 5px;">
+								<i class="fa fa-search open_search_box"></i>
+								<input type="text" id="boat_search" class="boat-search hm_search hidden" value="{{#ifCond session.search_val "!=" 0}}{{#ifCond session.search_val "!=" '0'}}{{session.search_val}}{{/ifCond}}{{/ifCond}}" aria-labelledby="site_searchLabel" placeholder="Search Boats">
+								<i class="fa fa-times close_search_box hidden"></i>
+							</li>
+							<div class="tt-suggestion hidden">
+                			</div>
+						</ul>
+					</div>
+					<div class="col-md-2">
+						<ul class="nav-contact-list">
+							{{#each companyContacts}}
+							<li><a href="tel:+1{{phone}}">{{city}} {{phone}}</a></li>
+							{{/each}}
+							{{!-- <li><a href="tel:+208-678-5869">BURLEY 208-678-5869</a></li>
+							<li><a href="tel:+208-522-8888">IDAHO FALLS 208-522-8888</a></li>
+							<li><a href="tel:+208-634-8888">MCCALL 208-634-8888</a></li> --}}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+	<div class="grand-parent">
+		<div class="mega-menu-parent boats-mega-menu">
+		<div class="container-fluid">
+			<div class="row mx-0">
+				<div class="col-md-11 col-lg-10 col-xl-9 m-auto bg-white">
+					<div class="container-fluid">
+						<div class="row">
+						<div class="col-lg-8 shadow-class">
+							<div class="mega-menu-list">
+								<div class="mega-menu-item">
+									<div class="mega-menu-heading">INVENTORY</div>
+									<ul>
+										<li><a href="/new-boats-for-sale">New Boats for sale</a></li>
+										<li><a href="/used-pre-owned-boats-for-sale">Pre-Owned Boats for sale</a></li>
+										<li><a href="/boats-for-sale">Shop All Boats</a></li>
+									</ul>
+								</div>
+
+								<div class="mega-menu-item">
+									<div class="mega-menu-heading">SHOP BOATS BY TYPE</div>
+									<ul>
+										{{!-- <li><a href="/boats-for-sale?class=Cruiser">Cruiser</a></li> --}}
+										<li><a href="/boats-for-sale?class=Jet">Jet Boat</a></li>
+										<li><a href="/boats-for-sale?class=Pontoon">Pontoon</a></li>
+										<li><a href="/boats-for-sale?class=Ski and Wakeboard Boat">Wake/Surf/Ski</a></li>
+									</ul>
+								</div>
+
+								<div class="mega-menu-item">
+									<div class="mega-menu-heading">BY BRAND</div>
+									<ul>
+										<li><a href="/boats-for-sale?brand=Axis">Axis</a></li>
+										<li><a href="/boats-for-sale?brand=Bennington">Bennington</a></li>
+										<li><a href="/boats-for-sale?brand=Flite">Flite</a></li>
+										<li><a href="/boats-for-sale?brand=Malibu">Malibu</a></li>
+										<li><a href="/boats-for-sale?brand=Montara">Montara</a></li>
+										<li><a href="/boats-for-sale?brand=Nautique">Nautique</a></li>
+										<li><a href="/boats-for-sale?brand=Yamaha Jet">Yamaha Jet</a></li>
+									</ul>
+								</div>
+
+								<div class="mega-menu-item">
+									<div class="mega-menu-heading">SELL, TRADE</div>
+									<ul>
+										<li><a href="/value-trade">Sell/Trade Your Boat</a></li>
+									</ul>
+								</div>
+
+								<div class="mega-menu-item">
+									<div class="mega-menu-heading">OTHER INVENTORY</div>
+									<ul>
+										<li><a href="/boats-for-sale?class=Personal Watercraft">Personal Watercraft</a></li>
+										<li><a href="/brand/Flite-efoils-for-sale-idaho">E-Foils</a></li>
+									</ul>
+								</div>
+
+								<div class="mega-menu-item">
+									<div class="mega-menu-heading">FINANCING</div>
+									<ul>
+										{{!-- <li><a href="javascript:(void)">Boat Financing</a></li> --}}
+										<li><a target="_blank" href="https://secure.accelerate.dealer.com/dealer/24123">Get Pre-Approved</a></li>
+									</ul>
+								</div>
+
+
+							</div>
+						</div>
+
+						<div class="col-lg-4 px-0">
+							<div class="mega-menu-main-img">
+								<img src="https://cdn.mdsbrand.com/resize/mean-idaho-staging/assets/images/mega-menu-imgs/mega-menu-item-1.png?w=600&format=webp" alt="{{imgAlt 'front-menu-mega-menu-item-1' 'Mega Menu Item 1'}}" data-alt-key="front-menu-mega-menu-item-1">
+							</div>
+						</div>
+
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="mega-menu-parent service-mega-menu">
+		<div class="container-fluid">
+			<div class="row mx-0">
+				<div class="col-md-11 col-lg-10 col-xl-9 m-auto bg-white">
+					<div class="container-fluid">
+						<div class="row">
+						<div class="col-lg-8 shadow-class">
+							<div class="mega-menu-list">
+								<div class="mega-menu-item service-menu-item">
+									<div class="mega-menu-heading">MARINE SERVICE</div>
+									<ul>
+										<li><a href="/boat-service-repair-idaho">Marine Service Center</a></li>
+										<li><a href="/winterization">Winterization</a></li>
+										<li><a href="/nampa-winterization">Nampa Winterization</a></li>
+
+									</ul>
+								</div>
+
+								<div class="mega-menu-item service-menu-item">
+									<div class="mega-menu-heading">PARTS &amp; ACCESSORIES</div>
+									<ul>
+										<li><a href="/parts">Request Parts and Accessories</a></li>
+
+									</ul>
+								</div>
+
+								{{!-- <div class="mega-menu-item service-menu-item">
+									<div class="mega-menu-heading">STORAGE</div>
+									<ul>
+										<li><a href="/boat-dry-storage-idaho">Boat Storage</a></li>
+									</ul>
+								</div> --}}
+
+								<div class="mega-menu-item service-menu-item">
+									<div class="mega-menu-heading">WINTER GEAR SERVICE</div>
+									<ul>
+										<li><a href="/snowboard-ski-services">Ski &amp; Snowboard Tuning</a></li>
+									</ul>
+								</div>
+
+								<div class="mega-menu-item service-menu-item dock-menu-item">
+									<div class="mega-menu-heading">DOCKS</div>
+									<ul>
+										<li><a href="/boat-docking-idaho">Boat Dock Sales</a></li>
+										<li class="has-dock-flyout">
+											<a href="/boat-docking-idaho">Dock Brands <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+											<ul class="dock-flyout">
+												<li><a href="/ez-dock-idaho">EZ Dock</a></li>
+												<li><a href="/shore-master-idaho">ShoreMaster</a></li>
+												<li><a href="/shore-station-idaho">ShoreStation</a></li>
+												<li><a href="/polydock-idaho">PolyDock</a></li>
+												<li><a href="/rhino-dock-floatation-idaho">Rhino</a></li>
+												<li><a href="/beachlauncher">BeachLauncher</a></li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+
+
+							</div>
+						</div>
+
+						<div class="col-lg-4 px-0">
+							<div class="mega-menu-main-img">
+								<img src="https://cdn.mdsbrand.com/resize/mean-idaho-staging/assets/images/mega-menu-imgs/mega-menu-item-2.png?w=600&format=webp" alt="{{imgAlt 'front-menu-mega-menu-item-2' 'Mega Menu Item 2'}}" data-alt-key="front-menu-mega-menu-item-2">
+							</div>
+						</div>
+
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+
+	</header>
+
+	<style>
+		@media screen and (min-width: 992px){
+			body {
+				padding-bottom: 0px !important;
+			}
+
+		}
+
+		/* Global nav: non-heading element styled to match the previous <h2> mega-menu titles */
+		.mega-menu-item .mega-menu-heading{
+			margin-top: 0;
+			margin-bottom: 20px;
+			margin-left: 5px;
+			line-height: 1.2;
+			font-size: 20px;
+			font-weight: bold;
+		}
+		@media (max-width: 1300px){
+			.mega-menu-item .mega-menu-heading{
+				font-size: 18px;
+			}
+		}
+
+		/* Dock brands flyout inside the Services & Docks mega menu */
+		.mega-menu-item .has-dock-flyout{
+			position: relative;
+		}
+		.mega-menu-item .has-dock-flyout > .dock-flyout{
+			display: none;
+			position: absolute;
+			top: -15px;
+			left: 100%;
+			min-width: 210px;
+			background: #fff;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+			list-style: none;
+			padding: 15px 20px;
+			margin: 0;
+			z-index: 20;
+		}
+		.mega-menu-item .has-dock-flyout:hover > .dock-flyout{
+			display: block;
+		}
+		.mega-menu-item .has-dock-flyout > a i{
+			font-size: 14px;
+			margin-left: 4px;
+		}
+
+		/* Desktop nav dropdowns (Our Community, Locations) */
+		.nav-list .nav-dropdown{
+			position: relative;
+		}
+		.nav-list .nav-dropdown .nav-submenu{
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			min-width: 220px;
+			background: #fff;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+			list-style: none;
+			padding: 12px 0;
+			margin: 0;
+			z-index: 1000;
+		}
+		.nav-list .nav-dropdown:hover .nav-submenu{
+			display: block;
+		}
+		.nav-list .nav-dropdown .nav-submenu li{
+			padding: 0;
+		}
+		/* Keep submenu links dark — the parent .hover-class:hover forces descendant
+		   links to white !important, which would make them invisible on the white panel. */
+		.nav-list .nav-dropdown .nav-submenu li a,
+		.nav-list .nav-dropdown:hover .nav-submenu li a{
+			display: block;
+			padding: 8px 20px;
+			color: #000 !important;
+			text-decoration: none;
+			white-space: nowrap;
+		}
+		.nav-list .nav-dropdown .nav-submenu li a:hover{
+			color: #ee3525 !important;
+		}
+	</style>
+	    <!-- Mobile Header -->
+		<header class="container-fluid d-block d-lg-none mobile_header {{#ifCond padding_zero '==' '1'}}px-0{{/ifCond}}">
+			<nav class="navbar navbar-expand-xl navbar-light" style="background-color: #fff;">
+				<div class="container-fluid">
+				<a class="navbar-brand" href="/"><img src="https://cdn.mdsbrand.com/resize/mean-idaho-staging/assets/images/logo-new.png?w=240&format=webp" alt="{{imgAlt 'front-menu-idaho' 'idaho'}}" data-alt-key="front-menu-idaho" class="img-fluid site-logo"></a>
+				{{#if showMobileSearch}}
+				<div class="srch_btn for_mobile">
+                <div class="srch">
+                    {{!-- <i class="fa fa-search boat-search2" aria-hidden="true"></i> --}}
+                    <i class="fa fa-search open_search_box" id="open_search_box"></i>
+                    <i class="fa fa-times close_search_box hidden" id="close_search_box"></i>
+                </div>
+                <div class="formWrapper home_srch">
+                    <input type="text" class="boat-search hm_search hidden" id="boat_search" value="{{#ifCond session.search_val "!=" 0}}{{#ifCond session.search_val "!=" '0'}}{{session.search_val}}{{/ifCond}}{{/ifCond}}" aria-labelledby="site_searchLabel" placeholder="Search Boats">
+                </div>
+                <div class="tt-suggestion hidden">
+                    {{!-- <a href=""
+                        class="focus-element" style="white-space: normal;">
+                        <div class="inventorySearchResult" style="display: flex;">
+                            <div class="imgContainer">
+                                <img width="180px" src=""
+                                    alt="{{imgAlt 'front-menu-img' ''}}" data-alt-key="front-menu-img">
+                            </div>
+                            <div class="conetntSectionContainer">
+                                <div class="invTitle">2023 Chevrolet Malibu <small>2LT</small>
+                                </div>
+                                <div class="invColor">Summit White</div>
+                                <div class="clearfix">
+
+                                </div>
+                                <div class="invPrice ">$28,995</div>
+                                <div class="invMiles">1589 miles</div>
+                                <div class="invStock 28763L" style="display:none">28763L</div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a> --}}
+                </div>
+            </div>
+			{{/if}}
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse idh_nav" id="navbarText">
+
+					<ul class="navbar-nav me-auto mobile_header__navbar mb-2 mb-lg-0 flex-column new-design-mbl">
+						<li class="nav-item">
+							<a href="javascript:(void)" class="nav-link toggle-nav">
+							BOATS
+							<span class="fa fa-plus"></span>
+							</a>
+							<div class="main-nav-content">
+								<ul class="inner-nav-list">
+								<li>INVENTORY</li>
+								<li><a href="/new-boats-for-sale">New Boats for sale</a></li>
+								<li><a href="/used-pre-owned-boats-for-sale">Pre-Owned Boats for sale</a></li>
+								<li><a href="/boats-for-sale">Shop All Boats</a></li>
+							</ul>
+
+							<ul class="inner-nav-list">
+								<li>SHOP BOATS BY TYPE</li>
+								{{!-- <li><a href="/boats-for-sale?class=Cruiser">Cruiser</a></li> --}}
+								<li><a href="/boats-for-sale?class=Jet">Jet Boat</a></li>
+								<li><a href="/boats-for-sale?class=Pontoon">Pontoon</a></li>
+								<li><a href="/boats-for-sale?class=Ski and Wakeboard Boat">Wake / Surf / Ski</a></li>
+							</ul>
+
+							<ul class="inner-nav-list">
+								<li>BY BRAND</li>
+								<li><a href="/brand/Axis-boats-for-sale-idaho">Axis</a></li>
+								<li><a href="/brand/Bennington-boats-for-sale-idaho">Bennington</a></li>
+								<li><a href="/brand/Flite-efoils-for-sale-idaho">Flite</a></li>
+								<li><a href="/brand/Malibu-boats-for-sale-idaho">Malibu</a></li>
+								<li><a href="/brand/Montara-boats-for-sale-idaho">Montara</a></li>
+								<li><a href="/brand/Nautique-boats-for-sale-idaho">Nautique</a></li>
+								<li><a href="/brand/Yamaha-boats-for-sale-idaho">Yamaha Jet</a></li>
+							</ul>
+
+							<ul class="inner-nav-list">
+								<li>Sell, Trade</li>
+								<li><a href="/value-trade">Sell / Trade Your Boat</a></li>
+							</ul>
+
+							<ul class="inner-nav-list">
+								<li>OTHER INVENTORY</li>
+								<li><a href="/boats-for-sale?class=Personal%20Watercraft">Personal Watercraft</a></li>
+								<li><a href="/brand/Flite-efoils-for-sale-idaho">E-Foils</a></li>
+							</ul>
+
+							<ul class="inner-nav-list">
+								<li>FINANCING</li>
+								{{!-- <li><a href="javascript:(void)">Boat Financing</a></li> --}}
+								<li><a target="_blank" href="https://secure.accelerate.dealer.com/dealer/24123">Get Pre-Approved</a></li>
+							</ul>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="javascript:(void)" class="nav-link toggle-nav">SERVICES &amp; DOCKS
+							<span class="fa fa-plus"></span>
+							</a>
+							<div class="main-nav-content">
+								<ul class="inner-nav-list">
+									<li>MARINE SERVICE</li>
+									<li><a href="/boat-service-repair-idaho">Marine Service Center</a></li>
+									<li><a href="/winterization">Winterization</a></li>
+									<li><a href="/nampa-winterization">Winterization</a></li>
+								</ul>
+
+								<ul class="inner-nav-list">
+									<li>PARTS &amp; ACCESSORIES</li>
+									<li><a href="/parts">Request Parts and Accessories</a></li>
+								</ul>
+
+								{{!-- <ul class="inner-nav-list">
+									<li>STORAGE</li>
+									<li><a href="/boat-dry-storage-idaho">Boat Storage</a></li>
+								</ul> --}}
+
+								<ul class="inner-nav-list">
+									<li>WINTER GEAR SERVICE</li>
+									<li><a href="/snowboard-ski-services">Ski &amp; Snowboard Tuning</a></li>
+								</ul>
+
+								<ul class="inner-nav-list">
+									<li>DOCKS</li>
+									<li><a href="/boat-docking-idaho">Boat Dock Sales</a></li>
+									<li><a href="/ez-dock-idaho">EZ Dock</a></li>
+									<li><a href="/shore-master-idaho">ShoreMaster</a></li>
+									<li><a href="/shore-station-idaho">ShoreStation</a></li>
+									<li><a href="/polydock-idaho">PolyDock</a></li>
+									<li><a href="/rhino-dock-floatation-idaho">Rhino</a></li>
+									<li><a href="/beachlauncher">BeachLauncher</a></li>
+								</ul>
+
+							</div>
+						</li>
+                        <li class="nav-item"><a target="_blank" href=" https://buywakeworks.com/" class="nav-link">SHOP GEAR</a></li>
+                        <li class="nav-item"><a href="/contact-us-new-used-boat-sales-service-parts" class="nav-link">LOCATIONS</a></li>
+						<li class="nav-item">
+							<a href="javascript:(void)" class="nav-link toggle-nav">OUR COMMUNITY
+							<span class="fa fa-plus"></span>
+							</a>
+							<div class="main-nav-content">
+								<ul class="inner-nav-list">
+									<li><a href="/about-us-boat-sales-service-parts-rentals-storage-idaho">About Us</a></li>
+									<li><a href="/events-idahotwatersports">Events</a></li>
+									<li><a href="/blogs">Blog</a></li>
+									<li><a href="/award-and-achievements">Awards &amp; Achievements</a></li>
+								</ul>
+							</div>
+						</li>
+                        <li class="nav-item"><a href="/contact-us-new-used-boat-sales-service-parts" class="nav-link">CONTACT US</a></li>
+                        {{!-- <li class="nav-item"><i class="fa fa-search"></i></li> --}}
+
+					</ul>
+
+				</div>
+				</div>
+			</nav>
+		</header>
+		<!-- Mobile Header -->

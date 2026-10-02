@@ -1,0 +1,214 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media (min-width: 768px) {
+    .container {
+        width: 750px;
+    }
+}
+@media (min-width: 1200px) {
+    .container {
+        width: 970px;
+    }
+}
+@media(min-width:1370px){
+    .container {
+        width: 1170px;
+    }
+}
+@media (min-width: 1440px) {
+    .container {
+        width: 1400px;
+    }
+}
+@media(max-width:1440px){
+    .container {
+        width: 1400px;
+    }
+}
+@media(max-width:1400px){
+    .container {
+        width: 1170px;
+    }
+
+}
+@media(max-width:1199px){
+    .container {
+        width: 970px;
+    }
+}
+@media(max-width:991px){
+    .container {
+        width: 100%;
+    }
+}
+
+.email_heading {
+    background-image:url(https://cdn.mdsbrand.com/madis/assets/images/email_heading.png);
+    color: #2f66c1;
+    float: left;
+    font-size: 30px;
+    font-weight: bold;
+    height: 79px;
+    margin-bottom: 16px;
+    padding-left: 92px;
+    padding-top: 25px;
+    background-repeat: no-repeat;
+    margin-left: 12px;
+}
+.email_short {
+    width: 100%;
+    float: left;
+    text-align: left;
+    padding-left: 12px;
+    color: #FFF;
+    cursor: pointer;
+    background: #2f66c1 none repeat scroll 0 0;
+    margin:0 0 15px;
+    font-size: 26px;
+}
+.email_short_box {
+    padding: 0;
+    width: 100%;
+    float: left;
+    overflow: hidden;
+    margin-right: 10px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background: #eeeeee;
+}
+.email_panel{
+    padding: 40px;
+}
+.email_label label {
+    width: 100%;
+    float: left;
+    padding-bottom: 20px;
+}
+.check_box_area {
+    padding: 25px 0;
+    color: #666;
+    font-size: 16px;
+}
+input[type="checkbox"] {
+    border: 1px solid #b4b9be;
+    background: #fff;
+    color: #555;
+    clear: none;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 0;
+    height: 16px;
+    margin: -4px 4px 0 0;
+    margin-bottom: 0px;
+    outline: 0;
+    padding: 0 !important;
+    text-align: center;
+    vertical-align: middle;
+    width: 16px;
+    min-width: 16px;
+    -webkit-appearance: none;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    -webkit-transition: .05s border-color ease-in-out;
+    transition: .05s border-color ease-in-out;
+}
+input[type="radio"]:checked::before, input[type="checkbox"]:checked::before {
+    float: left;
+    display: inline-block;
+    vertical-align: middle;
+    width: 16px;
+    font: 400 21px/1 dashicons;
+    speak: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+input[type="checkbox"]:checked::before {
+    content: "\2713";
+    font-size: 16px;
+    font-weight: bold;
+    color: #1e8cbe;
+    margin: -1px 0 0 -1px;
+}
+.input_field_select{
+    width: 415px;
+ }
+ .input_field{
+     width: 415px;
+     /* float: left; */
+     background: rgba(255,255,255,.5);
+     border: 1px solid #ddd;
+     border-color: rgba(222,222,222,.75);
+     -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.04);
+     box-shadow: inset 0 1px 2px rgba(0,0,0,.04);
+     color: rgba(51,51,51,.5);
+     transition: 50ms border-color ease-in-out;
+ }
+
+
+ .map_shortcodes h3 {
+     margin: 0;
+     font-size: 14px;
+ }
+ .map_shortcodes {
+     background: #2f66c1 none repeat scroll 0 0;
+     color: #fff;
+     margin: 0 15px 20px;
+     padding: 5px 10px;
+     border-radius: 8px;
+ }
+ .email_panel_2{
+     padding: 0 40px;
+ }
+ .checkbox_shortcode{
+     padding-top:5px;
+ }
+ .email_panel_3 {
+     padding: 50px 40px;
+ }
+ .save_changes_box {
+     width: 100%;
+     float: left;
+     text-align: right;
+     padding: 50px 15px 0 0;
+ }
+
+ .save_btn {
+     border-radius: 24px;
+     margin-top: 27px;
+     background: #006e87;
+     border-color: #0073aa #006799 #006799;
+     -webkit-box-shadow: 0 1px 0 #006799;
+     box-shadow: 0 1px 0 #006799;
+     color: #fff;
+     text-decoration: none;
+     text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
+     padding: 5px 28px;
+ }
+
+
+
+ /* .save_btn {
+     border-radius: 24px;
+     margin-top: 27px;
+     background: #0085ba;
+     border-color: #0073aa #006799 #006799;
+     -webkit-box-shadow: 0 1px 0 #006799;
+     box-shadow: 0 1px 0 #006799;
+     color: #fff;
+     text-decoration: none;
+     text-shadow: 0 -1px 1px #006799,1px 0 1px #006799,0 1px 1px #006799,-1px 0 1px #006799;
+     padding: 5px 10px;
+ } */
+ .email_panel_toggle{
+     padding: 0 40px;
+     display:none;
+ }
+
+ #list_email_template_list{
+     color: white;
+ }
+
+ #btn_save{
+     margin-bottom: 10px;
+ }

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+
+    {{#if canonicalUrl}}<link rel="canonical" href="{{canonicalUrl}}">{{/if}}
+
+    {{#if noindex}}
+    <meta name="robots" content="noindex,follow">
+    {{else}}
+    <meta name="robots" content="INDEX,FOLLOW">
+    {{/if}}
+
+    {{#if metaDescription}}
+    <meta name="description" content="{{metaDescription}}">
+    {{/if}}
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+    <!-- jQuery UI slider theme -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- Main stylesheet (82KB — boats listing layout) -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <!-- Inventory filter stylesheet (74KB) -->
+    <link rel="stylesheet" href="/assets/css/inventory-style.css">
+
+    <!-- jQuery loads in <head> so body scripts can use $ immediately -->
+    <script src="/assets/js/jquery.min.js"></script>
+
+    <!--
+        applyView stub defined in <head> so inventory-results.js can safely
+        call window.applyView() inside its AJAX success callback.
+        The REAL implementation in custom.js (loaded at bottom of body)
+        overwrites this stub on DOM ready.
+    -->
+    <script>
+        window.applyView = function(view) {
+            if (view === 'list') {
+                $('.boat-card').show();
+                $('.grid-boat-card').hide();
+                $('.grid-view-btn').removeClass('active');
+                $('.list-view-btn').addClass('active');
+            } else {
+                $('.boat-card').hide();
+                $('.grid-boat-card').show();
+                $('.list-view-btn').removeClass('active');
+                $('.grid-view-btn').addClass('active');
+            }
+            $('.toggleViewBtn').each(function() {
+                if ($(this).hasClass('active')) {
+                    $(this).find('.white-btn').show();
+                    $(this).find('.black-btn-sec').hide();
+                } else {
+                    $(this).find('.white-btn').hide();
+                    $(this).find('.black-btn-sec').show();
+                }
+            });
+        };
+
+        /* initializeBoatSliders is called inside inventory-results.js after AJAX.
+           Defined here as no-op so it never throws; custom.js can override if needed. */
+        function initializeBoatSliders() {}
+    </script>
+
+    <style>
+        /* Loader overlay — boats.hbs shows/hides this during AJAX calls */
+        .loader-wrapper {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.75);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2196f3;
+            border-radius: 50%;
+            width: 48px; height: 48px;
+            animation: _spin 0.7s linear infinite;
+        }
+        @keyframes _spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+{{{body}}}
+
+<!--
+    ── Script load order (mirrors reference repo exactly) ──────────────────────
+    1. jquery-ui.js              ← range sliders
+    2. jquery.ui.touch-punch.js  ← mobile slider support
+    3. inventory-filter-url.js   ← buildInventoryFilterUrl, updateBrowserUrl, updateFilterCounts
+    4. inventory-filter-controls.js ← filterCheckboxSelected, updateInventoryFilter, removeInventoryFilter, slider init
+    5. inventory-results.js      ← getBoats() — calls updateBrowserUrl + applyView at event-time
+    6. custom.js                 ← applyView (real impl), opacity fix, view toggle, sort, accordion, search, load more
+    ────────────────────────────────────────────────────────────────────────────
+-->
+<script src="/assets/js/jquery-ui.js"></script>
+<script src="/assets/js/jquery.ui.touch-punch.min.js"></script>
+<script src="/assets/js/inventory-filter-url.js"></script>
+<script src="/assets/js/inventory-filter-controls.js"></script>
+<script src="/assets/js/inventory-results.js"></script>
+<script src="/assets/js/custom.js"></script>
+
+<!--
+    Load More handler — copied EXACTLY from reference repo views/layouts/layout.hbs lines 823-865.
+    Inventory pages: POSTs full filter state. Other pages: simple GET.
+    NOTE: does NOT disable the button — reference repo never does that.
+-->
+<script>
+jQuery(document).on('click', '.load_more_action', function () {
+    var ajax_url    = jQuery(this).attr('data-ajax_url');
+    var current_page = jQuery(this).attr('data-current_page');
+    var nextPage    = parseFloat(current_page) + 1;
+    var filterInputs = jQuery('.boat_filter');
+
+    function onSuccess(data) {
+        jQuery('#boats-list').append(data.result);
+        initializeBoatSliders();
+        setTimeout(function() {
+            var view = localStorage.getItem('boatView') || 'list';
+            window.applyView(view);
+        }, 100);
+        if (data.current_page == data.pageCount) {
+            jQuery('.load_more_action').hide();
+        } else {
+            jQuery('.load_more_action').attr('data-current_page', data.current_page);
+        }
+    }
+
+    if (filterInputs.length > 0) {
+        /* Inventory pages: POST all active filter hidden inputs */
+        var filterData = {};
+        filterInputs.each(function () {
+            filterData[jQuery(this).attr('id')] = jQuery(this).val();
+        });
+        jQuery.ajax({
+            type:    'POST',
+            url:     ajax_url + '&current_page=' + nextPage,
+            data:    filterData,
+            success: onSuccess
+        });
+    } else {
+        /* Non-inventory pages: simple GET */
+        jQuery.ajax({
+            type:    'GET',
+            url:     ajax_url,
+            data:    { current_page: nextPage },
+            success: onSuccess
+        });
+    }
+});
+</script>
+
+</body>
+</html>
