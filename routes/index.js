@@ -476,9 +476,11 @@ router.all(boatListingPaths, (req, res, next) => {
         || typeof req.query['horse-power'] !== 'undefined'
         || typeof req.query.hourse_power !== 'undefined') {
         let hpVal = req.body.horse_power_val ? req.body.horse_power_val : (req.query.horse_power || req.query['horse-power'] || req.query.hourse_power);
-        let horse_power = hpVal.toString().replace(/hp$/i, '').split('-');
-        filter.hourse_power = { $gte: parseFloat(horse_power[0]), $lte: parseFloat(horse_power[1]) };
-        req.session[sessionName].horse_power_val = hpVal;
+        let parsedHp = inventoryUrl.parseHorsePowerVal(hpVal);
+        if (parsedHp) {
+            inventoryUrl.applyHorsePowerRange(filter, parsedHp.min, parsedHp.max);
+        }
+        req.session[sessionName].horse_power_val = Array.isArray(hpVal) ? (parsedHp ? (parsedHp.min + '-' + parsedHp.max) : hpVal[hpVal.length - 1]) : hpVal;
     } else if (req.body.horse_power_val == 0) {
         req.session[sessionName].horse_power_val = 0;
     }
@@ -551,8 +553,10 @@ router.all(boatListingPaths, (req, res, next) => {
             filter.engine_make = { $in: cleanArray(s.engine_make_val.split(',')).map(function(v) { return new RegExp('^' + v.trim() + '$', 'i'); }) };
         }
         if (s.horse_power_val != 0 && typeof s.horse_power_val !== 'undefined') {
-            let horse_power = s.horse_power_val.toString().replace(/hp$/i, '').split('-');
-            filter.hourse_power = { $gte: parseFloat(horse_power[0]), $lte: parseFloat(horse_power[1]) };
+            let parsedHp = inventoryUrl.parseHorsePowerVal(s.horse_power_val);
+            if (parsedHp) {
+                inventoryUrl.applyHorsePowerRange(filter, parsedHp.min, parsedHp.max);
+            }
         }
     }
 

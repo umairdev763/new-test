@@ -337,9 +337,12 @@ $(function () {
                 // (horse_power and other new filters may have no DB data yet)
                 if (dataMin === dataMax || dataMax === 0) return;
                 var stored  = $('#' + cfg.hiddenId).val() || '0';
-                var parts   = stored !== '0' ? stored.replace(/[a-z]/gi, '').split('-') : [];
-                var v0      = parseFloat(parts[0]) || dataMin;
-                var v1      = parseFloat(parts[1]) || dataMax;
+                // Strip letters (e.g. "hp") so string horse-power values still parse 
+                var parts   = stored !== '0' ? String(stored).replace(/[a-z]/gi, '').split('-') : [];
+                var v0      = parseFloat(parts[0]);
+                var v1      = parseFloat(parts[1]);
+                if (isNaN(v0)) v0 = dataMin;
+                if (isNaN(v1)) v1 = dataMax;
 
                 // Set initial display text
                 $disp.val(fmt(v0) + ' - ' + fmt(v1));
@@ -358,8 +361,8 @@ $(function () {
                         if (maxId) $('#' + maxId).text(fmt(ui.values[1]));
                     },
                     stop: function (_event, ui) {
-                        var v0 = ui.values[0], v1 = ui.values[1];
-                        updateInventoryFilter(updateKey, (v0 === 0 && v1 === 0) ? '0' : v0 + '-' + v1);
+                        var sv0 = ui.values[0], sv1 = ui.values[1];
+                        updateInventoryFilter(updateKey, (sv0 === 0 && sv1 === 0) ? '0' : sv0 + '-' + sv1);
                     },
                 });
             }

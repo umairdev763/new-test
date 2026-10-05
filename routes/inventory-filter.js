@@ -74,7 +74,11 @@ router.all(
         }
 
         // ---- Build MongoDB filter from URL segments ----
-        const filter = inventoryUrl.buildMongoFilter(parsed.filters, parsed.condition, req.query);
+        const filter = inventoryUrl.buildMongoFilter(
+            parsed.filters,
+            parsed.condition,
+            Object.assign({}, req.query, req.body)
+        );
 
         // ---- SEO meta ----
         const canonicalUrl = inventoryUrl.buildCanonicalUrl(req, parsed.basePath, parsed.location, parsed.filters);
