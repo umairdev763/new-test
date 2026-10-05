@@ -78,9 +78,9 @@ function buildInventoryFilterUrl() {
     // ---- Sort FILTER_DEFS by prescribed URL segment order ----
     // SIDEBAR_FILTERS (the source of FILTER_DEFS) controls sidebar panel rendering order,
     // which is independent of the URL segment order. We sort here so the URL always
-    // emits segments as: type → make → model → price → year → length → hours,
+    // emits segments as: type → make → model → price → year → length → hours → engine_make → horse_power,
     // regardless of how the sidebar panels are ordered.
-    var URL_PREFIX_ORDER = ['type', 'make', 'model', 'series', 'price', 'year', 'length', 'hours'];
+    var URL_PREFIX_ORDER = ['type', 'make', 'model', 'series', 'price', 'year', 'length', 'hours', 'engine_make', 'horse_power'];
     var sortedDefs = (window.FILTER_DEFS || []).slice().sort(function(a, b) {
         var ai = a.urlPrefix ? URL_PREFIX_ORDER.indexOf(a.urlPrefix) : 999;
         var bi = b.urlPrefix ? URL_PREFIX_ORDER.indexOf(b.urlPrefix) : 999;

@@ -300,6 +300,8 @@ router.all(boatListingPaths, (req, res, next) => {
         req.session[sessionName].length_val    = 0;
         req.session[sessionName].year_val      = 0;
         req.session[sessionName].pricemax_val  = 0;
+        req.session[sessionName].engine_make_val = 0;
+        req.session[sessionName].horse_power_val = 0;
     }
 
     if (req.query.shop_all === 'true') {
@@ -315,6 +317,8 @@ router.all(boatListingPaths, (req, res, next) => {
         req.session[sessionName].length_val    = 0;
         req.session[sessionName].year_val      = 0;
         req.session[sessionName].pricemax_val  = 0;
+        req.session[sessionName].engine_make_val = 0;
+        req.session[sessionName].horse_power_val = 0;
         return res.redirect('/boats-for-sale');
     }
 
@@ -454,6 +458,31 @@ router.all(boatListingPaths, (req, res, next) => {
         req.session[sessionName].pricemax_val = 0;
     }
 
+    if (req.body.engine_make_val != 0 && typeof req.body.engine_make_val !== 'undefined'
+        || typeof req.query.engine_make !== 'undefined'
+        || typeof req.query['engine-make'] !== 'undefined') {
+        let engine_make = req.body.engine_make_val ? req.body.engine_make_val : (req.query.engine_make || req.query['engine-make']);
+        if (Array.isArray(engine_make)) engine_make = engine_make.join(',');
+        unfiltered = engine_make.split(',');
+        filtered   = cleanArray(unfiltered);
+        filter.engine_make = { $in: filtered.map(function(v) { return new RegExp('^' + v.trim() + '$', 'i'); }) };
+        req.session[sessionName].engine_make_val = engine_make;
+    } else if (req.body.engine_make_val == 0) {
+        req.session[sessionName].engine_make_val = 0;
+    }
+
+    if ((req.body.horse_power_val != 0 && typeof req.body.horse_power_val !== 'undefined')
+        || typeof req.query.horse_power !== 'undefined'
+        || typeof req.query['horse-power'] !== 'undefined'
+        || typeof req.query.hourse_power !== 'undefined') {
+        let hpVal = req.body.horse_power_val ? req.body.horse_power_val : (req.query.horse_power || req.query['horse-power'] || req.query.hourse_power);
+        let horse_power = hpVal.toString().replace(/hp$/i, '').split('-');
+        filter.hourse_power = { $gte: parseFloat(horse_power[0]), $lte: parseFloat(horse_power[1]) };
+        req.session[sessionName].horse_power_val = hpVal;
+    } else if (req.body.horse_power_val == 0) {
+        req.session[sessionName].horse_power_val = 0;
+    }
+
     // Search keyword from session (persisted across requests)
     if ((type === 'boats-for-sale' || type === 'new-boats-for-sale')
         && req.session.new_search_val && req.session.new_search_val !== '0') {
@@ -518,6 +547,13 @@ router.all(boatListingPaths, (req, res, next) => {
             let price = s.pricemax_val.split('-');
             filter.boatPrice = { $gte: parseInt(price[0]), $lte: parseInt(price[1]) };
         }
+        if (s.engine_make_val != 0 && typeof s.engine_make_val !== 'undefined') {
+            filter.engine_make = { $in: cleanArray(s.engine_make_val.split(',')).map(function(v) { return new RegExp('^' + v.trim() + '$', 'i'); }) };
+        }
+        if (s.horse_power_val != 0 && typeof s.horse_power_val !== 'undefined') {
+            let horse_power = s.horse_power_val.toString().replace(/hp$/i, '').split('-');
+            filter.hourse_power = { $gte: parseFloat(horse_power[0]), $lte: parseFloat(horse_power[1]) };
+        }
     }
 
     // ---- Sorting ----
@@ -570,6 +606,9 @@ router.all(boatListingPaths, (req, res, next) => {
                     minYear:        results.min_year[0]   ? results.min_year[0].boat_year     : 0,
                     maxPrice:       results.max_price[0]  ? results.max_price[0].boatPrice    : 0,
                     minPrice:       results.min_price[0]  ? results.min_price[0].boatPrice    : 0,
+                    engine_make:    results.engine_make,
+                    maxHorsePower:  results.max_horse_power[0] ? parseFloat(results.max_horse_power[0].hourse_power) || 0 : 0,
+                    minHorsePower:  results.min_horse_power[0] ? parseFloat(results.min_horse_power[0].hourse_power) || 0 : 0,
                     pageCount:      results.pageCount,
                     current_page:   parseInt(current_page),
                 });
@@ -721,6 +760,7 @@ router.all(boatListingPaths, (req, res, next) => {
                 boat_class:        results.boat_class,
                 boat_model:        results.boat_model,
                 boat_series:       results.boat_series,
+                engine_make:       results.engine_make,
                 pageCount:         results.pageCount,
                 maxLength:         results.max_Length[0] ? results.max_Length[0].boat_length : 0,
                 minLength:         results.min_Length[0] ? results.min_Length[0].boat_length : 0,
@@ -728,6 +768,8 @@ router.all(boatListingPaths, (req, res, next) => {
                 minYear:           results.min_year[0]   ? results.min_year[0].boat_year     : 0,
                 maxPrice:          results.max_price[0]  ? results.max_price[0].boatPrice    : 0,
                 minPrice:          results.min_price[0]  ? results.min_price[0].boatPrice    : 0,
+                maxHorsePower:     results.max_horse_power[0] ? parseFloat(results.max_horse_power[0].hourse_power) || 0 : 0,
+                minHorsePower:     results.min_horse_power[0] ? parseFloat(results.min_horse_power[0].hourse_power) || 0 : 0,
                 current_page:      parseInt(current_page),
                 session:           req.session[sessionName],
                 message:           '',
@@ -751,12 +793,15 @@ router.all(boatListingPaths, (req, res, next) => {
                     boat_model:     results.boat_model,
                     boat_series:    results.boat_series,
                     boat_class:     results.boat_class,
+                    engine_make:    results.engine_make,
                     minLength:      results.min_Length[0] ? results.min_Length[0].boat_length : 0,
                     maxLength:      results.max_Length[0] ? results.max_Length[0].boat_length : 0,
                     minYear:        results.min_year[0]   ? results.min_year[0].boat_year     : 0,
                     maxYear:        results.max_year[0]   ? results.max_year[0].boat_year     : 0,
                     minPrice:       results.min_price[0]  ? results.min_price[0].boatPrice    : 0,
                     maxPrice:       results.max_price[0]  ? results.max_price[0].boatPrice    : 0,
+                    minHorsePower:  results.min_horse_power[0] ? parseFloat(results.min_horse_power[0].hourse_power) || 0 : 0,
+                    maxHorsePower:  results.max_horse_power[0] ? parseFloat(results.max_horse_power[0].hourse_power) || 0 : 0,
                 }, req.session[sessionName] || {}),
             });
         })

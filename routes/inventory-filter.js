@@ -39,10 +39,10 @@ router.get('/used-pre-owned-boats-for-sale-detail/:id', (req, res) => {
 // ---------------------------------------------------------------------------
 
 router.all(
-    /^\/(boats-for-sale|new-boats-for-sale|used-boats-for-sale)(-[a-z0-9-]+)?(?:\/((?:type-|make-|model-|search-|price-|year-|length-|hours-|page-)[a-z0-9+\/-]*))?\/?\s*$/i,
+    /^\/(boats-for-sale|new-boats-for-sale|used-boats-for-sale)(-[a-z0-9-]+)?(?:\/((?:type-|make-|model-|search-|price-|year-|length-|hours-|engine_make-|engine-make-|horse_power-|horse-power-|horsepower-|hourse_power-|page-)[a-z0-9+\/_\\-]*))?\/?\s*$/i,
     async (req, res, next) => {
         const hasLocation = /^\/(boats-for-sale|new-boats-for-sale|used-boats-for-sale)-[a-z0-9-]/i.test(req.path);
-        const hasFilter   = /\/(type-|make-|model-|search-|price-|year-|length-|hours-|page-)/.test(req.path);
+        const hasFilter   = /\/(type-|make-|model-|search-|price-|year-|length-|hours-|engine_make-|engine-make-|horse_power-|horse-power-|horsepower-|hourse_power-|page-)/.test(req.path);
 
         if (!hasLocation && !hasFilter) return next();
 
@@ -120,12 +120,15 @@ router.all(
                     boat_series:    results.boat_series,
                     boat_class:     results.boat_class,
                     boat_category:  results.category,
+                    engine_make:    results.engine_make,
                     maxLength:      results.max_Length[0] ? results.max_Length[0].boat_length : 0,
                     minLength:      results.min_Length[0] ? results.min_Length[0].boat_length : 0,
                     maxYear:        results.max_year[0]   ? results.max_year[0].boat_year     : 0,
                     minYear:        results.min_year[0]   ? results.min_year[0].boat_year     : 0,
                     maxPrice:       results.max_price[0]  ? results.max_price[0].boatPrice    : 0,
                     minPrice:       results.min_price[0]  ? results.min_price[0].boatPrice    : 0,
+                    maxHorsePower:  results.max_horse_power[0] ? parseFloat(results.max_horse_power[0].hourse_power) || 0 : 0,
+                    minHorsePower:  results.min_horse_power[0] ? parseFloat(results.min_horse_power[0].hourse_power) || 0 : 0,
                     pageCount:      results.pageCount,
                     current_page:   parseInt(currentPage),
                     canonicalUrl:   canonicalUrl,
@@ -141,9 +144,10 @@ router.all(
             const { pageTitle, metaDescription } = buildPageMeta(parsed);
 
             // Slug → DB name matching for session pre-checking
-            var catList   = (results.category  || []).filter(function(item) { return item._id; });
-            var brandList = (results.boat_brand || []).filter(function(item) { return item._id; });
-            var modelList = (results.boat_model || []).filter(function(item) { return item._id; });
+            var catList       = (results.category  || []).filter(function(item) { return item._id; });
+            var brandList     = (results.boat_brand || []).filter(function(item) { return item._id; });
+            var modelList     = (results.boat_model || []).filter(function(item) { return item._id; });
+            var engineMakeList = (results.engine_make || []).filter(function(item) { return item._id; });
 
             function matchCategorySlug(slug) {
                 var unslug = inventoryUrl.unslugify(slug);
@@ -158,6 +162,11 @@ router.all(
             function matchModelSlug(slug) {
                 var unslug = inventoryUrl.unslugify(slug);
                 var match  = modelList.find(function(m) { return m._id.toLowerCase() === unslug.toLowerCase(); });
+                return match ? match._id : unslug;
+            }
+            function matchEngineMakeSlug(slug) {
+                var unslug = inventoryUrl.unslugify(slug);
+                var match  = engineMakeList.find(function(e) { return e._id.toLowerCase() === unslug.toLowerCase(); });
                 return match ? match._id : unslug;
             }
 
@@ -191,21 +200,44 @@ router.all(
                 matchedModel = modelSlugs.map(matchModelSlug).join(',');
             }
 
+            let matchedEngineMake = 0;
+            var engineMakeParam = req.query.engine_make || req.query['engine-make'];
+            if (parsed.filters.engine_make) {
+                var engineMakeSlugs = Array.isArray(parsed.filters.engine_make) ? parsed.filters.engine_make : [parsed.filters.engine_make];
+                if (engineMakeParam) {
+                    var extraEngineMakes = Array.isArray(engineMakeParam) ? engineMakeParam : [engineMakeParam];
+                    engineMakeSlugs = engineMakeSlugs.concat(extraEngineMakes);
+                }
+                matchedEngineMake = engineMakeSlugs.map(matchEngineMakeSlug).join(',');
+            } else if (engineMakeParam) {
+                var queryEngineMakes = Array.isArray(engineMakeParam) ? engineMakeParam : [engineMakeParam];
+                matchedEngineMake = queryEngineMakes.map(matchEngineMakeSlug).join(',');
+            }
+
+            var hpVal = 0;
+            if (parsed.filters.horse_power) {
+                hpVal = parsed.filters.horse_power.min + '-' + parsed.filters.horse_power.max;
+            } else if (req.query.horse_power || req.query['horse-power'] || req.query.hourse_power) {
+                hpVal = (req.query.horse_power || req.query['horse-power'] || req.query.hourse_power).toString().replace(/hp$/i, '');
+            }
+
             // Session-compatible data structure for boats.hbs
             const sessionData = {
-                condition_val:  parsed.condition || 0,
-                brand_val:      matchedBrand,
-                boat_type_val:  0,
-                category_val:   matchedCategory,
-                model_val:      matchedModel,
-                year_val:       parsed.filters.year   ? parsed.filters.year.min   + '-' + parsed.filters.year.max   : 0,
-                length_val:     parsed.filters.length ? parsed.filters.length.min + '-' + parsed.filters.length.max : 0,
-                pricemax_val:   parsed.filters.price  ? parsed.filters.price.min  + '-' + parsed.filters.price.max  : 0,
-                boat_name_val:  parsed.filters.search || 0,
-                location_val:   0,
-                class_val:      0,
-                series_val:     0,
-                sort_by:        activeSortKey,
+                condition_val:   parsed.condition || 0,
+                brand_val:       matchedBrand,
+                boat_type_val:   0,
+                category_val:    matchedCategory,
+                model_val:       matchedModel,
+                year_val:        parsed.filters.year   ? parsed.filters.year.min   + '-' + parsed.filters.year.max   : 0,
+                length_val:      parsed.filters.length ? parsed.filters.length.min + '-' + parsed.filters.length.max : 0,
+                pricemax_val:    parsed.filters.price  ? parsed.filters.price.min  + '-' + parsed.filters.price.max  : 0,
+                boat_name_val:   parsed.filters.search || 0,
+                location_val:    0,
+                class_val:       0,
+                series_val:      0,
+                engine_make_val: matchedEngineMake,
+                horse_power_val: hpVal,
+                sort_by:         activeSortKey,
             };
 
             results.category = (results.category || []).filter(item => item._id);
@@ -214,14 +246,18 @@ router.all(
                 boat_condition: results.boat_condition,
                 boat_brand:     results.boat_brand,
                 boat_category:  results.category,
+                boat_class:     results.boat_class,
                 boat_model:     results.boat_model,
                 boat_series:    results.boat_series,
+                engine_make:    results.engine_make,
                 minLength:      results.min_Length[0] ? results.min_Length[0].boat_length : 0,
                 maxLength:      results.max_Length[0] ? results.max_Length[0].boat_length : 0,
                 minYear:        results.min_year[0]   ? results.min_year[0].boat_year     : 0,
                 maxYear:        results.max_year[0]   ? results.max_year[0].boat_year     : 0,
                 minPrice:       results.min_price[0]  ? results.min_price[0].boatPrice    : 0,
                 maxPrice:       results.max_price[0]  ? results.max_price[0].boatPrice    : 0,
+                minHorsePower:  results.min_horse_power[0] ? parseFloat(results.min_horse_power[0].hourse_power) || 0 : 0,
+                maxHorsePower:  results.max_horse_power[0] ? parseFloat(results.max_horse_power[0].hourse_power) || 0 : 0,
             };
             const filterPanels = inventoryUrl.buildFilterPanels(templateData, sessionData);
 
@@ -249,6 +285,7 @@ router.all(
                 boat_class:        results.boat_class,
                 boat_model:        results.boat_model,
                 boat_series:       results.boat_series,
+                engine_make:       results.engine_make,
                 pageCount:         results.pageCount,
                 maxLength:         results.max_Length[0] ? results.max_Length[0].boat_length : 0,
                 minLength:         results.min_Length[0] ? results.min_Length[0].boat_length : 0,
@@ -256,6 +293,8 @@ router.all(
                 minYear:           results.min_year[0]   ? results.min_year[0].boat_year     : 0,
                 maxPrice:          results.max_price[0]  ? results.max_price[0].boatPrice    : 0,
                 minPrice:          results.min_price[0]  ? results.min_price[0].boatPrice    : 0,
+                maxHorsePower:     results.max_horse_power[0] ? parseFloat(results.max_horse_power[0].hourse_power) || 0 : 0,
+                minHorsePower:     results.min_horse_power[0] ? parseFloat(results.min_horse_power[0].hourse_power) || 0 : 0,
                 current_page:      parseInt(currentPage),
                 session:           sessionData,
                 message:           '',

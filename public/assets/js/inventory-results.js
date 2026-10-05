@@ -386,8 +386,11 @@ function getBoats(no_boat_msg) {
                 // Loops over FILTER_DEFS range entries — no code change needed when adding a range filter.
                 (window.FILTER_DEFS || []).filter(function(c) { return c.type === 'range'; })
                     .forEach(function(cfg) {
-                        // Skip if the server response doesn't include this range's keys
+                        // Skip if the server response doesn't include this range's keys,
+                        // or if both are 0 (no data in DB for this field — slider was never
+                        // initialised so calling .slider('option') would throw an error).
                         if (msg[cfg.minKey] == null || msg[cfg.maxKey] == null) return;
+                        if (msg[cfg.minKey] === 0 && msg[cfg.maxKey] === 0) return;
 
                         var stored   = $('#' + cfg.hiddenId).val() || '0';
                         var rawParts = stored !== '0' ? stored.replace(/[a-z]/gi, '').split('-') : [];
@@ -403,6 +406,10 @@ function getBoats(no_boat_msg) {
 
                         $('#' + cfg.displayId).val(fmtRange(newMin) + ' - ' + fmtRange(newMax));
                         if (cfg.mobDisplayId) $('#' + cfg.mobDisplayId).val(fmtRange(newMin) + ' - ' + fmtRange(newMax));
+                        if (cfg.minValId) $('#' + cfg.minValId).text(fmtRange(newMin));
+                        if (cfg.maxValId) $('#' + cfg.maxValId).text(fmtRange(newMax));
+                        if (cfg.mobMinId) $('#' + cfg.mobMinId).text(fmtRange(newMin));
+                        if (cfg.mobMaxId) $('#' + cfg.mobMaxId).text(fmtRange(newMax));
 
                         var $r   = $('#' + cfg.rangeId);
                         var $mob = $('#' + cfg.mobRangeId);

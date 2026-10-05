@@ -114,7 +114,7 @@ $(document).on('click', '.inner_wrap_bt a.opeN_clik', function () {
     if (!key || key === 'Sortby') return;
     // Desktop: slide down the matching filterList
     var $desktopPanel = $('.desktop_dis .filterOptions').filter(function () {
-        return $(this).find('div[id="' + key + '-filter"]').length > 0;
+        return $(this).find('div[id="' + key + '-filter"], div[id="' + key + '-range"]').length > 0;
     });
     $desktopPanel.find('.filterList').slideDown(200);
     // Mobile: slide down the matching accordion content

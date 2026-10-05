@@ -111,8 +111,8 @@ function filterCheckboxSelected(filterKey, element) {
     // Collect all currently-checked values (exclude "all" sentinel)
     for (var i = 0, n = checkboxes.length; i < n; i++) {
         if (checkboxes[i].checked && checkboxes[i].value !== 'all') {
-            // brand / category have values with possible spaces; join as-is
-            if (filterKey === 'brand' || filterKey === 'category') {
+            // brand / category / engine_make have values with possible spaces; join as-is
+            if (filterKey === 'brand' || filterKey === 'category' || filterKey === 'engine_make') {
                 if (!checkboxes[checkboxes[i].value]) {
                     chked_vals += checkboxes[i].value + ',';
                 }
@@ -138,8 +138,8 @@ function filterCheckboxSelected(filterKey, element) {
     } else {
         localStorage.checked = false;
 
-        // brand / category: the li id uses the raw value (with spaces) so checkbyid=1
-        var checkbyid = (filterKey === 'brand' || filterKey === 'category') ? 1 : 0;
+        // brand / category / engine_make: the li id uses the raw value (with spaces) so checkbyid=1
+        var checkbyid = (filterKey === 'brand' || filterKey === 'category' || filterKey === 'engine_make') ? 1 : 0;
 
         removeInventoryFilter(filterKey + '_' + element.value + '_filter', checkbyid);
     }
@@ -157,7 +157,7 @@ function filterCheckboxSelected(filterKey, element) {
  * List items embed removeInventoryFilter() in their onclick so the unified
  * remove handler is used regardless of page type.
  *
- * @param {string} key                - filter key, e.g. 'brand', 'year', 'pricemax'
+ * @param {string} key                - filter key, e.g. 'brand', 'year', 'pricemax', 'horse_power'
  * @param {Array}  filtered_chkd_array - array of value strings (may contain comma-separated values)
  */
 function updateInventoryFilter(key, filtered_chkd_array) {
@@ -170,9 +170,9 @@ function updateInventoryFilter(key, filtered_chkd_array) {
     // Remove existing tags for this filter
     $('.' + key + '_selected_filters').remove();
 
-    if (key === 'year' || key === 'pricemax' || key === 'length') {
+    if (key === 'year' || key === 'pricemax' || key === 'length' || key === 'horse_power') {
         // Range filters — single tag with the range value
-        var label = key === 'pricemax' ? 'Price Max' : (key.charAt(0).toUpperCase() + key.slice(1));
+        var label = key === 'pricemax' ? 'Price Max' : (key === 'horse_power' ? 'Horse Power' : (key.charAt(0).toUpperCase() + key.slice(1)));
         t += '<li class="' + key + '_selected_filters" id="' + key + '_' + filtered_chkd_array + '_filter">' +
              '<span style="textTransform:capitalize"><strong>' + label + '</strong> : ' + filtered_chkd_array + '</span>' +
              '<span onclick="removeInventoryFilter(\'' + key + '_' + filtered_chkd_array + '_filter\')" class="pull-right closX">X</span>' +
@@ -192,11 +192,10 @@ function updateInventoryFilter(key, filtered_chkd_array) {
                     if (selecteditem === 'Ski;Wakeboard-Boat') selecteditem = 'Ski/Wakeboard Boat';
                     if (selecteditem === 'Pontoon-Boats') selecteditem = 'Pontoon Boats';
 
-                    var ky_t = key.replace('_', ' ').charAt(0).toUpperCase() +
-                               key.replace('_', ' ').slice(1);
+                    var ky_t = key.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
                     t += '<li class="' + key + '_selected_filters" id="' + key + '_' + selecteditem + '_filter">' +
                          '<span style="textTransform:capitalize"><strong>' + ky_t + '</strong> : ' + selectitem + '</span>' +
-                         '<span onclick="removeInventoryFilter(\'' + key + '_' + selecteditem + '_filter\')" ' +
+                         '<span onclick="removeInventoryFilter(\'' + key + '_' + selecteditem + '_filter\', ' + (key === 'engine_make' ? 1 : 0) + ')" ' +
                          'class="pull-right closX" data-id="' + selecteditem + '">X</span>' +
                          '</li>';
                 }
@@ -220,11 +219,25 @@ function updateInventoryFilter(key, filtered_chkd_array) {
 function removeInventoryFilter(eav, checkbyid) {
     checkbyid = checkbyid || 0;
 
-    var params = eav.split('_');
-    params[1] = params[1].replace(/\s+/g, '-');
+    var knownKeys = ['engine_make', 'horse_power', 'pricemax', 'brand', 'model', 'class', 'series', 'category', 'length', 'year', 'condition', 'location', 'boat_type'];
+    var filterKey = '';
+    var filterVal = '';
+    for (var ki = 0; ki < knownKeys.length; ki++) {
+        var k = knownKeys[ki];
+        if (eav.startsWith(k + '_')) {
+            filterKey = k;
+            filterVal = eav.slice(k.length + 1).replace(/_filter$/, '');
+            break;
+        }
+    }
+    if (!filterKey) {
+        var params = eav.split('_');
+        filterKey = params[0];
+        filterVal = params.slice(1, -1).join('_');
+    }
 
     // If a Brand filter is removed, automatically clear all dependent Model filters
-    if (params[0] === 'brand') {
+    if (filterKey === 'brand') {
         // Clear the model hidden input
         $('#model_val').val(0);
         // Uncheck all model checkboxes
@@ -245,25 +258,25 @@ function removeInventoryFilter(eav, checkbyid) {
         // Try hyphenated form first; fall back to original (spaces) form
         var el = document.getElementById(eav) || document.getElementById(originalEav);
         if (el) el.remove();
-        checkboxvalue = params[1].replace(/-/gi, ' ');
+        checkboxvalue = filterVal.replace(/-/gi, ' ');
     } else {
         var tempid = eav.replace(/\s+/g, '-');
         if (tempid === 'category_Pontoon-Boats_filter') tempid = 'category_Pontoon Boats_filter';
         if (tempid === 'category_Ski/Wakeboard-Boat_filter') tempid = 'category_Ski/Wakeboard Boat_filter';
-        var el2 = document.getElementById(tempid);
+        var el2 = document.getElementById(tempid) || document.getElementById(eav);
         if (el2) el2.remove();
-        checkboxvalue = params[1];
+        checkboxvalue = filterVal;
     }
 
     // Remove the value from the hidden input's comma-separated list.
     // Case-insensitive comparison handles the slug-vs-DB-name mismatch that arises
     // when the session restore block capitalises a slug ('barletta' → 'Barletta')
     // while the hidden input still holds the original slug form.
-    var all_values = $('#' + params[0] + '_val').val();
+    var all_values = $('#' + filterKey + '_val').val() || '';
     all_values = all_values.replace(/\s+/g, '-');
-    var all_values_array = all_values.split(',');
-    params[1] = params[1].replace(';', '/');
-    var normalizedTarget = params[1].toLowerCase();
+    var all_values_array = all_values ? all_values.split(',') : [];
+    var targetVal = filterVal.replace(';', '/');
+    var normalizedTarget = targetVal.toLowerCase().replace(/\s+/g, '-');
     var index = -1;
     for (var vi = 0; vi < all_values_array.length; vi++) {
         if (all_values_array[vi].toLowerCase() === normalizedTarget) {
@@ -277,9 +290,9 @@ function removeInventoryFilter(eav, checkbyid) {
 
     if (all_values_array.length > 0 && all_values_array[0] !== '') {
         var all_val = all_values_array.join(',').replace(/-/g, ' ');
-        $('#' + params[0] + '_val').val(all_val);
+        $('#' + filterKey + '_val').val(all_val);
     } else {
-        $('#' + params[0] + '_val').val(0);
+        $('#' + filterKey + '_val').val(0);
     }
 
     // Normalise checkbox value back to its original form for unchecking
@@ -320,7 +333,9 @@ $(function () {
                 if (!$range.length || !$disp.length) return; // element not in DOM
                 var dataMin = parseFloat($disp.data('min')) || 0;
                 var dataMax = parseFloat($disp.data('max')) || 0;
-                if (dataMin === dataMax) return; // no range data yet — skip init
+                // Skip init if: no real range data (both 0), or min equals max
+                // (horse_power and other new filters may have no DB data yet)
+                if (dataMin === dataMax || dataMax === 0) return;
                 var stored  = $('#' + cfg.hiddenId).val() || '0';
                 var parts   = stored !== '0' ? stored.replace(/[a-z]/gi, '').split('-') : [];
                 var v0      = parseFloat(parts[0]) || dataMin;

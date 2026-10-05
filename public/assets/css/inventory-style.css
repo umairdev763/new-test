@@ -254,10 +254,6 @@
     margin: 0;
 }
 
-.catbox input {
-    /*    display: none;*/
-}
-
 .filterInner label {
     font-weight: 300;
     margin-bottom: 5px;
@@ -874,6 +870,7 @@ div#price-range {
     line-height: 25px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     position: relative;
@@ -1157,6 +1154,7 @@ div#price-range {
     line-height: 25px;
     display: -webkit-box;
     -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-decoration: none;
@@ -1644,6 +1642,7 @@ div#length-range {
 .listing-desc {
     display: -webkit-box !important;
     -webkit-line-clamp: 3 !important;
+    line-clamp: 3 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
     max-height: 100px !important;
@@ -3597,6 +3596,12 @@ div#length-range {
     .lisitng-search-box{
         display: none !important;
     }
+    .list-view {
+        display: none !important;
+    }
+    .grid-boat-card {
+        display: block !important;
+    }
     .sold-content-wrapper {
         padding-left: unset;
         padding-right: unset;
@@ -3671,14 +3676,6 @@ div#length-range {
     .listing-container {
         padding-left: 0;
         padding-right: 0;
-    }
-
-    .list-view {
-        display: none !important;
-    }
-
-    .grid-boat-card {
-        display: block !important;
     }
 
     .similar-slider {
@@ -3908,10 +3905,6 @@ div#length-range {
         font-size: 27px;
         line-height: 30px;
         letter-spacing: 2px;
-    }
-
-    .grid-boat-card {
-        width: 100% !important;
     }
 
     .grid-boat-card {
