@@ -1,0 +1,1744 @@
+<style>
+	.grid-boat-card {
+		display: block !important;
+	}
+
+	.grid-boat-card {
+		width: calc(100% / 4);
+	}
+
+	.iti {
+		width: 100% !important;
+	}
+
+	.questionColorText{
+		color: #328DB0 !important;
+	}
+
+	.faq-cntnt{
+		font-size: 18px;
+	}
+
+	.faqSection strong{
+		font-size: 18px;
+	}
+	.sub-header{
+		display: none;
+	}
+	/* ── Gallery waits for see360: collapsed (not display:none) so the sliders still
+	   initialise at full width, then revealed if see360 has no spin for the boat ── */
+	.see360-gallery-pending {
+		height: 0;
+		overflow: hidden;
+		visibility: hidden;
+	}
+	/* ── Boat Detail Video Thumbnail ── */
+	.boatDetailCarouselImageContainer .bd-video-link,
+	.gallery-box-img .bd-video-link,
+	.slider-img .bd-video-link {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+	.slider-nav-img .bd-video-link {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+	.bd-video-item {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+	.bd-video-item img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.bd-video-play {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 60px;
+		height: 60px;
+		background: rgba(0, 0, 0, 0.65);
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		font-size: 22px;
+		pointer-events: none;
+		transition: background 0.2s;
+	}
+	.bd-video-link:hover .bd-video-play {
+		background: rgba(0, 0, 0, 0.88);
+	}
+	.bd-video-play-sm {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 32px;
+		height: 32px;
+		background: rgba(0, 0, 0, 0.65);
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		font-size: 12px;
+		pointer-events: none;
+	}
+</style>
+
+<div class="custom-modal-box">
+	<div class="modal-content-box">
+		<div class="modal-content-col modal-white-sec">
+			<div>
+
+				<div class="clearfix form-group">
+					<label id="BoatPricelabel" for="BoatPrice" class="popup_label">Purchase Price</label>
+					<input class="popup_input form-control" aria-labelledby="BoatPricelabel" id="cal-total-loan-amount"
+						type="text" placeholder="" value="{{{purchasePrice results.MSRP results.boatPrice}}}" required />
+				</div>
+
+				<div class="clearfix form-group">
+					<label id="DownPaymentlabel" for="DownPayment" class="popup_label">Down Payment</label>
+					<input class="popup_input form-control" aria-labelledby="DownPaymentlabel" id="cal-down-payment"
+						type="text" placeholder="" value="{{{purchasePrice25Percent results.MSRP results.boatPrice}}}" required />
+				</div>
+			</div>
+
+
+			<div>
+
+				<div class="clearfix form-group">
+					<label id="Termlabel" for="Term" class="popup_label">Term</label>
+					<input onchange="numeric(this)" aria-labelledby="Termlabel" class="popup_input form-control"
+						id="cal-loan-period" type="text" placeholder="" value="20" required />
+				</div>
+
+
+				<div class="clearfix form-group">
+					<label id="InterestLabel" for="Interest" class="popup_label">Interest Rate</label>
+					<input onchange="validateFloat(this)" aria-labelledby="InterestLabel"
+						class="popup_input form-control" id="cal-interest-rate" type="text" placeholder="" value="7.99" required />
+					<input type="hidden" id="cal-result-value" />
+				</div>
+
+			</div>
+
+		</div>
+		<div class="modal-content-col calculate-box">
+
+			<div>
+				<div class="disclaimer-dropdown">
+					<button class="disclaimer-btn">Disclaimer</button>
+					<div class="disclaimer-content">
+						<p>Monthly payment estimates are for informational purposes only and do not constitute a financing offer. Actual monthly payments may vary based on credit approval, down payment, interest rate, loan term, taxes, fees, and other applicable charges. Contact the dealership for specific terms, conditions, and financing options. All offers are subject to change without notice.</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="calc-error-box">
+				<p style="display: none;" class="notify_popup_message"></p>
+			</div>
+
+			<div id="monthly_payment_container" class="result_box text-center">
+			
+				<h2 style="margin: 0;" class="formHeading">Est. Monthly Payment</h2>
+				<h3 style="margin: 0;" class="formHeading" id="monthly_payment_text">
+					{{!-- <span>$544.32/mo for 240 months.</span> --}}
+				</h3>
+				{{!-- <p>*Monthly payment is subject to change based on finance application variables.</p> --}}
+			</div>
+
+			{{!-- <div class="submit_btn_box text-center">
+				<button id="monthly_payment_calculate_form_btn"
+					class="custom_btn submit_btn_popup customBtn calculate-btn">
+					Calculate
+				</button>
+			</div> --}}
+
+			<button class="close-btn-1 close-modal">X</button>
+			<button class="close-btn-2 close-modal"><span>X</span> &nbsp; Close</button>
+
+		</div>
+	</div>
+</div>
+
+<div>
+	<div class="breadcrumb-container">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Home</a></li>
+				<li class="breadcrumb-item"><a href="/boats-for-sale">Listings</a></li>
+				<li class="breadcrumb-item active">
+					{{#ifCond results.boat_condition '==' 'New'}}
+					<a href="/new-boats-for-sale-detail/{{results.boatPermalink}}">
+						{{results.boat_year}} {{results.boat_make}} {{results.boat_model}}
+					</a>
+					{{/ifCond}}
+
+					{{#ifCond results.boat_condition '==' 'Used'}}
+					<a href="/used-boats-for-sale-detail/{{results.boatPermalink}}">
+						{{results.boat_year}} {{results.boat_make}} {{results.boat_model}}
+					</a>
+					{{/ifCond}}
+
+				</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+{{#ifCond this.boat_condition '==' 'New'}}
+<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}">
+	<img src="{{this.productImage }}" class="boat-img"
+		alt="{{imgAlt 'boat-detail-this' 'This'}}" data-alt-key="boat-detail-this"Boats' ''}}">
+</a>
+{{/ifCond}}
+
+{{#ifCond this.boat_condition '==' 'Used'}}
+<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}">
+	<img src="{{this.productImage }}" class="boat-img"
+		alt="{{imgAlt 'boat-detail-this-2' 'This'}}" data-alt-key="boat-detail-this-2"Boats' ''}}">
+</a>
+{{/ifCond}}
+
+<!-- boat detail page starts here -->
+<section>
+
+	<div class="details-main-row">
+
+		<div class="details-left-container">
+
+			{{!-- See360 360-degree viewer is tried on every boat detail page, even when the boat has no
+			     HIN; data-unit-id passes the Salesforce record ID so see360 can still match the unit as a
+			     backup. The default gallery below stays collapsed while see360 loads and is revealed if
+			     see360 has no spin for this boat (see the script after the gallery). --}}
+			<div class="see360-viewer-wrapper pb-2" id="see360ViewerWrapper">
+				<div class="see360-viewer" data-vin="{{results.hullId}}" data-unit-id="{{results.Sales_force_Id}}"></div>
+			</div>
+
+			<div class="boat-detail-gallery see360-gallery-pending" id="boatDetailGallery">
+			<div class="owl-carousel-parent pb-2">
+				<div class="owl-carousel boat-detail-carosuel owl-theme">
+					{{#each results.boatImages}}
+					<div class="item">
+						<div class="boatDetailCarouselImageContainer">
+							<a href="{{this.image}}" data-fancybox="gallery-detail-carousel">
+								<img src="{{this.image}}" alt="{{imgAlt 'boat-detail-gallery-slide' 'Boat Gallery Image' @index}}" data-alt-key="boat-detail-gallery-slide">
+							</a>
+
+							<div class="boatShareBtnWrapper">
+								<a id="button3" data-toggle="modal" data-target="#contactModal_email" class="d-none d-lg-block"
+								href="#contactModal_email"><i class="fa-solid fa-share-nodes"></i></a>
+							</div>
+						</div>
+					</div>
+					{{#ifCond @index '==' 0}}
+					{{#if @root.results.videos}}
+					{{#each @root.results.videos}}
+					<div class="item video-item">
+						<div class="boatDetailCarouselImageContainer">
+							<a href="{{this.video}}" data-fancybox="gallery-detail-carousel" class="bd-video-link">
+								<div class="bd-video-item">
+									<img src="{{ytThumb this.video}}" alt="{{imgAlt 'boat-detail-boat-video' 'Boat Video'}}" data-alt-key="boat-detail-boat-video">
+									<div class="bd-video-play"><i class="fa-solid fa-play"></i></div>
+								</div>
+							</a>
+						</div>
+					</div>
+					{{/each}}
+					{{/if}}
+					{{/ifCond}}
+
+					{{/each}}
+
+				</div>
+
+				<!-- slick slider start here -->
+				<div class="slick-slider-box d-block d-lg-none">
+					<div class="slider-for">
+
+						{{#each images}}
+						<div class="slider-img">
+							<img src="{{this.image}}" alt="{{imgAlt 'boat-detail-slider-main' 'Boat Image Slide' @index}}" data-alt-key="boat-detail-slider-main">
+
+							<div class="boatShareBtnWrapper">
+								<button class="nativeShareBtn d-block d-lg-none"><i class="fa-solid fa-share-nodes"></i></button>
+							</div>
+						</div>
+						{{#ifCond @index '==' 0}}
+						{{#if @root.results.videos}}
+						{{#each @root.results.videos}}
+						<div class="slider-img video-slider-item">
+							<div class="bd-video-item">
+								<img src="{{ytThumb this.video}}" alt="{{imgAlt 'boat-detail-boat-video-2' 'Boat Video'}}" data-alt-key="boat-detail-boat-video-2">
+								<div class="bd-video-play"><i class="fa-solid fa-play"></i></div>
+							</div>
+						</div>
+						{{/each}}
+						{{/if}}
+						{{/ifCond}}
+						{{/each}}
+					</div>
+
+
+					<div class="slider-nav overflow-x-hidden mt-3">
+
+						{{#each images}}
+							{{#ifCond @root.results.boatImages.length '>=' 3}}
+								<div class="slider-nav-img">
+									<img src="{{this.image}}" alt="{{imgAlt 'boat-detail-slider-thumb' 'Boat Thumbnail' @index}}" data-alt-key="boat-detail-slider-thumb">
+								</div>
+							{{/ifCond}}
+							{{#ifCond @index '==' 0}}
+							{{#if @root.results.videos}}
+							{{#each @root.results.videos}}
+							{{#ifCond @root.results.boatImages.length '>=' 3}}
+							<div class="slider-nav-img video-nav-item">
+								<div class="bd-video-item">
+									<img src="{{ytThumb this.video}}" alt="{{imgAlt 'boat-detail-boat-video-3' 'Boat Video'}}" data-alt-key="boat-detail-boat-video-3">
+									<div class="bd-video-play-sm"><i class="fa-solid fa-play"></i></div>
+								</div>
+							</div>
+							{{/ifCond}}
+							{{/each}}
+							{{/if}}
+							{{/ifCond}}
+						{{/each}}
+
+					</div>
+				</div>
+
+				<!-- slick slider ends here -->
+
+
+				<div class="mobHide mt-3">
+					<div class="gallery-row">
+
+						{{!-- First loop: show first 4 images (index < 4), inject videos after index 0 --}}
+						{{#each results.boatImages as |h|}}
+							{{#ifCond @index '<' 4}}
+							<div class="gallery-cols">
+								<div class="gallery-box-img">
+									<a href="{{this.image}}" class="fancybox" rel="group" data-fancybox="boatDetailFancyBox1">
+										<img src="{{this.image}}"
+											alt="{{imgAlt 'boat-detail-this-3' 'This'}}" data-alt-key="boat-detail-this-3">
+									</a>
+								</div>
+							</div>
+							{{/ifCond}}
+							{{!-- Inject video thumbnail(s) right after first image --}}
+							{{#ifCond @index '==' 0}}
+							{{#if @root.results.videos}}
+							{{#each @root.results.videos}}
+							<div class="gallery-cols">
+								<div class="gallery-box-img">
+									<a href="{{this.video}}" class="fancybox bd-video-link" rel="group" data-fancybox="boatDetailFancyBox1">
+										<div class="bd-video-item">
+											<img src="{{ytThumb this.video}}" alt="{{imgAlt 'boat-detail-boat-video-4' 'Boat Video'}}" data-alt-key="boat-detail-boat-video-4">
+											<div class="bd-video-play"><i class="fa-solid fa-play"></i></div>
+										</div>
+									</a>
+								</div>
+							</div>
+							{{/each}}
+							{{/if}}
+							{{/ifCond}}
+						{{/each}}
+
+						{{!-- Second loop: remaining images (index >= 4) hidden, revealed by MORE IMAGES button --}}
+						{{#each results.boatImages as |h|}}
+							{{#ifCond @index '>=' 4}}
+							<div class="gallery-cols image-second-sec d-none">
+								<div class="gallery-box-img">
+									<a href="{{this.image}}" class="fancybox" rel="group" data-fancybox="boatDetailFancyBox1">
+										<img src="{{this.image}}"
+											alt="{{imgAlt 'boat-detail-this-5' 'This'}}" data-alt-key="boat-detail-this-5">
+									</a>
+								</div>
+							</div>
+							{{/ifCond}}
+						{{/each}}
+
+					</div>
+
+					{{#ifCond @root.results.boatImages.length '>' 4}}
+					<div class="more-img-btn">
+						<button id="load_more_images">MORE IMAGES</button>
+					</div>
+					{{/ifCond}}
+
+			</div>
+		</div>
+			</div>
+
+			<script>
+				// see360 renders into .see360-viewer: a ".see360-error" box when it can't load a spin
+				// (no spin for this HIN/unit, missing identifiers, API error), or the viewer plus a
+				// ".see360-badge" on success. Keep whichever one applies and drop the other.
+				(function () {
+					var wrapper = document.getElementById('see360ViewerWrapper');
+					var gallery = document.getElementById('boatDetailGallery');
+					var viewer = wrapper && wrapper.querySelector('.see360-viewer');
+					if (!viewer || !gallery) return;
+
+					var settled = false;
+					var observer = new MutationObserver(check);
+					// Fallback if the see360 API never answers.
+					var timer = setTimeout(function () {
+						if (!viewer.querySelector('.see360-badge')) showGallery();
+					}, 15000);
+
+					function settle() {
+						settled = true;
+						observer.disconnect();
+						clearTimeout(timer);
+					}
+
+					function showGallery() {
+						if (settled) return;
+						settle();
+						wrapper.parentNode.removeChild(wrapper);
+						gallery.classList.remove('see360-gallery-pending');
+						// The sliders were initialised while collapsed; re-measure them now they are visible.
+						if (window.jQuery) {
+							jQuery('.boat-detail-carosuel').trigger('refresh.owl.carousel');
+							jQuery('.slider-for.slick-initialized, .slider-nav.slick-initialized').slick('setPosition');
+						}
+					}
+
+					function showViewer() {
+						if (settled) return;
+						settle();
+						gallery.parentNode.removeChild(gallery);
+					}
+
+					function check() {
+						if (viewer.querySelector('.see360-error')) showGallery();
+						else if (viewer.querySelector('.see360-badge')) showViewer();
+					}
+
+					observer.observe(viewer, { childList: true });
+					check();
+					// The see360 script itself failed to load (blocked, offline): nothing will ever render.
+					document.addEventListener('DOMContentLoaded', function () {
+						if (!window.See360) showGallery();
+					});
+				})();
+			</script>
+
+		<div class="right-sidebar mb-3 d-block d-lg-none">
+			<h1 class="boat-details-title">{{results.boatTitle}}</h1>
+
+			{{#unless results.boatPrice}}
+			<div>
+				<a href="tel:+1{{closestContact.phoneRaw}}" class="call-now-btn">CALL US: {{closestContact.city}} {{closestContact.phone}}</a>
+			</div>
+			{{/unless}}
+
+			{{#unless results.boatPrice}}
+			<div>
+				<p class="callForprice">Request Pricing</p>
+			</div>
+			{{/unless}}
+
+
+			{{#if results.boatPrice}}
+				<div class="pymentBlock">
+					<div>{{{priceLogic results.MSRP results.boatPrice}}}</div>
+				</div>
+			{{/if}}
+
+			{{#if results.MSRP}}
+				{{#if results.boatPrice}}
+					<div class="saving-box">
+						<span>Saving</span>
+						<span>{{calculateSavings results.MSRP results.boatPrice}}*</span>
+					</div>
+				{{/if}}
+			{{/if}}
+
+			{{#if results.boatPrice}}
+				<div class="apply-box">
+					<div class="opeen-calc">
+						<span>Est. </span>
+						<strong>{{CalculatePaymentFromBoatPrice results.boatPrice}}/mo &nbsp;<img
+								src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/Vector.png" alt="{{imgAlt 'boat-detail-financing-icon' 'Financing Calculator'}}" data-alt-key="boat-detail-financing-icon"></strong>
+					</div>
+					<button><a target="_blank" href="https://secure.accelerate.dealer.com/dealer/24123$getpre-approved">Apply For Financing</a></button>
+				</div>
+			{{/if}}
+
+			{{#unless results.boatPrice}}
+				<div class="apply-box justify-content-center">
+					<button><a target="_blank" href="https://secure.accelerate.dealer.com/dealer/24123$getpre-approved">Apply For Financing</a></button>
+				</div>
+			{{/unless}}
+			
+
+			{{!-- {{#if results.boatPrice}}
+			<div class="pymentBlock">
+				<h4>${{PaymentLogic results.MSRP}}/month</h4>
+				<p>240 months, 7.99% APR <br> 20% Down Payment <br>
+					<a href="javascript:(void)" type="button" data-toggle="modal" data-target="#desclaimer">View
+						Disclamer</a>
+				</p>
+			</div>
+
+			{{/if}} --}}
+
+		</div>
+
+		<div class="specs-container">
+			<div class="specs">
+				<div class="custom-accordion">
+
+					<div class="custom-accordion-item">
+						<div class="accordion-header toggle-header mb-2">
+							<h3>SPECS</h1>
+								<span class="fa fa-minus"></span>
+						</div>
+						<div class="accordion-content toggle-content specc-show">
+
+							<div class="specs-row-box">
+								<div class="specs-cols">
+									{{#if results.boat_condition}}
+									<div class="specs-item">
+										<span> <img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/condition.png" alt="{{imgAlt 'boat-detail-spec-condition' 'Condition'}}" data-alt-key="boat-detail-spec-condition">Status</span>
+										<span>{{results.boat_condition}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.boat_year}}
+									<div class="specs-item">
+										<span> <img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/year.png" alt="{{imgAlt 'boat-detail-spec-year' 'Year'}}" data-alt-key="boat-detail-spec-year">Year</span>
+										<span>{{results.boat_year}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.boat_make}}
+									<div class="specs-item">
+										<span> <img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/make.png" alt="{{imgAlt 'boat-detail-spec-manufacturer' 'Manufacturer'}}" data-alt-key="boat-detail-spec-manufacturer">Manufacturer</span>
+										<span>{{results.boat_make}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.engine_hours}}
+									<div class="specs-item">
+										<span> <img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engine-hours.png" alt="{{imgAlt 'boat-detail-spec-hours' 'Engine Hours'}}" data-alt-key="boat-detail-spec-hours">Hours</span>
+										<span>{{results.engine_hours}} Hours</span>
+									</div>
+									{{/if}}
+
+									{{#if results.boat_model}}
+									<div class="specs-item">
+										<span> <img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/make.png" alt="{{imgAlt 'boat-detail-spec-model' 'Model'}}" data-alt-key="boat-detail-spec-model">Model</span>
+										<span>{{results.boat_model}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.category}}
+									<div class="specs-item">
+										<span> <img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/make.png" alt="{{imgAlt 'boat-detail-spec-category' 'Category'}}" data-alt-key="boat-detail-spec-category"> Category</span>
+										<span>{{results.category}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.type}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/make.png" alt="{{imgAlt 'boat-detail-spec-type' 'Type'}}" data-alt-key="boat-detail-spec-type">Type</span>
+										<span>{{results.type}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.engine_model}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png" alt="{{imgAlt 'boat-detail-spec-engine-model' 'Engine Model'}}" data-alt-key="boat-detail-spec-engine-model">Engine Model</span>
+										<span>{{results.engine_model}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.engine_type}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png" alt="{{imgAlt 'boat-detail-spec-engine-type' 'Engine Type'}}" data-alt-key="boat-detail-spec-engine-type">Engine Type</span>
+										<span>{{results.engine_type}}</span>
+									</div>
+									{{/if}}
+
+								</div>
+
+								<div class="specs-cols">
+
+									{{#if results.engine_description}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png" alt="{{imgAlt 'boat-detail-spec-engine-desc' 'Engine Description'}}" data-alt-key="boat-detail-spec-engine-desc">Engine Description</span>
+										<span>{{results.engine_description}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.boat_length}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/length.png" alt="{{imgAlt 'boat-detail-spec-length' 'Boat Length'}}" data-alt-key="boat-detail-spec-length">Boat Length</span>
+										<span>{{results.boat_length}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.engine_make}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png" alt="{{imgAlt 'boat-detail-spec-engine-make' 'Engine Make'}}" data-alt-key="boat-detail-spec-engine-make">Engine Make</span>
+										<span>{{results.engine_make}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.engine_year}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/year.png" alt="{{imgAlt 'boat-detail-spec-engine-year' 'Engine Year'}}" data-alt-key="boat-detail-spec-engine-year">Engine Year</span>
+										<span>{{results.engine_year}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.beam_length}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/Beam.png" alt="{{imgAlt 'boat-detail-spec-beam' 'Beam'}}" data-alt-key="boat-detail-spec-beam">Beam</span>
+										<span>{{results.beam_length}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.hull_type}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/year.png" alt="{{imgAlt 'boat-detail-spec-hull-type' 'Hull Type'}}" data-alt-key="boat-detail-spec-hull-type">Hull Type</span>
+										<span>{{results.hull_type}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.fuel_type}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/Fuel-Capacity.png" alt="{{imgAlt 'boat-detail-spec-fuel-type' 'Fuel Type'}}" data-alt-key="boat-detail-spec-fuel-type">Fuel Type</span>
+										<span>{{results.fuel_type}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.stock_number}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/stock-no.png" alt="{{imgAlt 'boat-detail-spec-stock-number' 'Stock Number'}}" data-alt-key="boat-detail-spec-stock-number" class="stock-img">Stock Number</span>
+										<span>{{results.stock_number}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.hullId}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/stock-no.png" alt="{{imgAlt 'boat-detail-spec-hull-id' 'Hull ID'}}" data-alt-key="boat-detail-spec-hull-id" class="stock-img">HIN</span>
+										<span>{{results.hullId}}</span>
+									</div>
+									{{/if}}
+
+									{{#if results.serial_number}}
+									<div class="specs-item">
+										<span><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/stock-no.png" alt="{{imgAlt 'boat-detail-spec-serial-number' 'Serial Number'}}" data-alt-key="boat-detail-spec-serial-number">Serial Number</span>
+										<span>{{results.serial_number}}</span>
+									</div>
+									{{/if}}
+								</div>
+
+							</div>
+
+							{{#if results.buildsheet_url }}
+								<div class="pdf-btn-box">
+									<a class="pdf-btn" href="{{ results.buildsheet_url }}">Download PDF</a>
+								</div>
+							{{/if}}
+
+						</div>
+
+					</div>
+
+					<hr>
+
+					{{#if results.features}}
+					<div class="custom-accordion-item">
+						<div class="accordion-header toggle-header">
+							<h3>Features</h1>
+								<span class="fa fa-minus"></span>
+						</div>
+						<div class="accordion-content toggle-content specc-show">
+							<div class="blackParaText">
+								<p>{{{results.features}}}</p>
+							</div>
+						</div>
+					</div>
+
+					<hr>
+					{{/if}}
+
+					{{#if results.boatDescription}}
+					<div class="custom-accordion-item">
+						<div class="accordion-header toggle-header">
+							<h3>DESCRIPTION</h1>
+								<span class="fa fa-minus"></span>
+						</div>
+						<div class="accordion-content toggle-content specc-show">
+							<div class="blackParaText">
+								<p>{{{results.boatDescription}}}</p>
+							</div>
+						</div>
+					</div>
+
+					<hr>
+					{{/if}}
+
+				</div>
+			</div>
+
+		</div>
+
+		<div class="trade-box">
+			<div class="trade-col-1">
+				<div class="trade-box-img">
+					<img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/trade-my-boat-icon.png" alt="{{imgAlt 'boat-detail-trade-icon' 'Trade My Boat'}}" data-alt-key="boat-detail-trade-icon">
+				</div>
+			</div>
+
+			<div class="trade-col-2">
+				<h3>Trade My Boat</h3>
+				<p>Trade-in and upgrade to the boat you've been dreaming about.</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="details-right-container">
+
+			{{#if results.specialOffer}}
+				{{#each results.specialEvents}}
+					<div class="specialBanner mb-4">
+						<div class="specialTag mb-4">
+							<p class="specialTagText">Special</p>
+							<hr class="specialWhiteLine">
+						</div>
+
+						<h3 class="specialBoatTitle">{{this.specialEventTitle}}</h3>
+
+						<div class="specialShortDescpWrap">
+							<p class="specialShortDescpText">{{this.shortDescription}}</p>
+						</div>
+
+						<div class="my-3 text-center">
+							<a href="javascript:void(0)" class="specailMoreDetailBtn">
+								<span class="closeBtnText">Offer Details</span>
+								<span class="specialBtnArrow">
+									<svg xmlns="http://www.w3.org/2000/svg" width="13" height="8" viewBox="0 0 13 8" fill="none">
+										<path d="M1 1L6.65685 6.65685L12.3137 1" stroke="white" stroke-opacity="0.6" />
+									</svg>
+								</span>
+							</a>
+						</div>
+					</div>
+				{{/each}}
+			{{/if}}
+
+
+		<div class="side-bar">
+			<div class="right-sidebar mb-3 d-none d-lg-block">
+			<h1 class="boat-details-title">{{results.boatTitle}}</h1>
+
+			{{#unless results.boatPrice}}
+			<div>
+				<a href="tel:+1{{closestContact.phoneRaw}}" class="call-now-btn">CALL US: {{closestContact.city}} {{closestContact.phone}}</a>
+			</div>
+			{{/unless}}
+
+			{{#unless results.boatPrice}}
+			<div>
+				<p class="callForprice">Request Pricing</p>
+			</div>
+			{{/unless}}
+
+			
+			{{#if results.boatPrice}}
+				<div class="pymentBlock">
+					<div>{{{priceLogic results.MSRP results.boatPrice}}}</div>
+				</div>
+			{{/if}}
+
+			{{#if results.MSRP}}
+				{{#if results.boatPrice}}
+					<div class="saving-box">
+						<span>Saving</span>
+						<span>{{calculateSavings results.MSRP results.boatPrice}}*</span>
+					</div>
+				{{/if}}
+			{{/if}}
+
+			{{#if results.boatPrice}}
+				<div class="apply-box">				
+					<div class="opeen-calc">
+						<span>Est. </span>
+						<strong>${{CalculatePaymentFromBoatPrice results.boatPrice}}/mo &nbsp;<img
+								src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/Vector.png" alt="{{imgAlt 'boat-detail-financing-icon' 'Financing Calculator'}}" data-alt-key="boat-detail-financing-icon"></strong>
+					</div>
+					<button><a target="_blank" href="https://secure.accelerate.dealer.com/dealer/24123$getpre-approved">Apply For Financing</a></button>
+				</div>
+			{{/if}}
+
+			{{#unless results.boatPrice}}
+				<div class="apply-box justify-content-center">
+					<button><a target="_blank" href="https://secure.accelerate.dealer.com/dealer/24123$getpre-approved">Apply For Financing</a></button>
+				</div>
+			{{/unless}}
+
+		</div>
+
+
+		<div class="boat-details-form-sec" id="contact_b_form">
+			<p class="scroll-down" id="dealer-form"></p>
+			<div class="inq-form-head">
+				<h3 class="text-center right-sidebar-sec-btn">Contact Dealer</h3>
+			</div>
+
+			<div class="gtm_form" id="contact_for_boat" data-form-id="VDP Form">
+				<div class="form-group">
+					<label for="f_name" class="sr-only">First Name</label>
+					<input type="text" id="f_name" name="f_name" class="boat-details-form require_check"
+						placeholder="First Name *">
+					<div class="field-error" id="error_f_name"></div>
+				</div>
+
+				<div class="form-group">
+					<label for="l_name" class="sr-only">Last Name</label>
+					<input type="text" id="l_name" name="l_name" class="boat-details-form require_check"
+						placeholder="Last Name *">
+					<div class="field-error" id="error_l_name"></div>
+				</div>
+
+				<div class="form-group">
+					<label for="email" class="sr-only">Email</label>
+					<input type="email" id="email" name="email" class="boat-details-form require_check"
+						placeholder="Email *">
+					<div class="field-error" id="error_email"></div>
+				</div>
+
+				<div class="form-group">
+					<label for="phone" class="sr-only">Phone</label>
+					<input id="phone" class="boat-details-form phoneInput require_check" type="tel" name="phone" />
+					<div class="field-error" id="error_phone"></div>
+				</div>
+
+				<div class="form-group">
+					<label for="zip_code" class="sr-only">Zip Code</label>
+					<input id="zip_code" class="boat-details-form require_check" type="zip_code" name="zip_code"
+						placeholder="Zip Code" />
+					<div class="field-error" id="error_zip_code"></div>
+				</div>
+
+				 <div class="form-group">
+                     <label for="rec-cont-dealership-location" class="sr-only">Dealership Location</label>
+                     <select id="rec-cont-dealership-location" name="rec_cont_dealership_location" class="boat-details-form require_check">
+                        <option value="">Dealership Location</option>
+                        <option value='Western Idaho'>Western Idaho</option>
+                        <option value='South Central Idaho'>South Central Idaho</option>
+                        <option value='Eastern Idaho'>Eastern Idaho</option>
+                        <option value='Northern Idaho'>Northern Idaho</option>
+                     </select>
+                     <div class="field-error" id="error_rec-cont-dealership-location"></div>
+                  </div>
+
+				<div class="form-group">
+					<label for="availability" class="sr-only">Comments</label>
+					<textarea rows="5" id="availability" class="boat-details-textarea" name="availability"
+						style="background-color:white;margin-bottom: 15px;" placeholder="Comments"></textarea>
+					<div class="field-error" id="error_availability"></div>
+				</div>
+
+				 <div class="dealer-form-box">
+					<div class="dealer-form-col-1">
+						<div class="form-group form-checkbox">
+						<label class="checkbox-label">
+							<input type="checkbox" name="keep_informed" class="checkbox-input" checked>
+							<span class="checkmark"></span>
+							Yes, Keep Me Informed
+						</label>
+					</div>
+
+						<div class="form-group form-checkbox">
+							<label class="checkbox-label">
+							<input type="checkbox" name="allow_texts" class="checkbox-input" checked>
+							<span class="checkmark"></span>
+							Yes, Allow Text Messages
+							</label>
+						</div>
+
+					</div>
+
+					<div class="dealer-form-col-2">
+						<a href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">View Disclaimer</a>
+					</div>
+				 </div>
+
+				<div class="form-group">
+					<input type="hidden" id="boatTitle" name="boatTitle" value="{{results.boatTitle}}">
+					<input type="hidden" id="boat_stock_no" name="boat_stock_no" value="{{results.stock_number}}">
+					<input type="text" name="honeypot" id="honeypot" class="honeypot" style="display: none;" autocomplete="off" tabindex="-1">
+					   {{> utm}}
+					<div class="btn_wrap text-center">
+						<button class="gtm_form_submit details-form-btn g-recaptcha" data-form-id="VDP Form"
+							data-sitekey="{{config.googleCaptchaSiteKey}}" data-callback='contact_for_boat'
+							data-action='submit'>Submit</button>
+					</div>
+					<div class="btns-cnt mt-3">
+						<button type="button" data-toggle="modal" data-target="#value_ur_trade" class="btn bg-dark text-white my-2  rounded-0 py-3 w-100 text-center text-uppercase">VALUE MY TRADE</button>
+				       <a href="https://secure.accelerate.dealer.com/dealer/24123" target="_blank" class="btn bg-dark text-white my-2 rounded-0 py-3 w-100 text-center text-uppercase" data-uw-rm-brl="PR" data-uw-original-href="https://secure.accelerate.dealer.com/dealer/24123" aria-label="GET PRE-APPROVED - open in a new tab" data-uw-rm-ext-link="" uw-rm-external-link-id="https://secure.accelerate.dealer.com/dealer/24123$getpre-approved">GET PRE-APPROVED</a>
+					</div>
+				</div>
+				<div id="notify_message"></div>
+			</div>
+
+		</div>
+		</div>
+
+	</div>
+</section>
+
+<!-- payment calculator modal starts -->
+<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">PAYMENT CALCULATOR</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="Total Purchase Price">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="Down Payment">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="Term (Years)">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="Annual Interest Rate">
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="redBtn">Calculate</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- payment calculator modal ends -->
+
+<!-- get pre approved modal starts -->
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">GET PRE-APPROVED</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="First Name">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="Last Name">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="email" class="formInput" placeholder="Email">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="phone" class="formInput" placeholder="Phone">
+				</div>
+
+				<div class="inputWrapper">
+					<input type="text" class="formInput" placeholder="Your Offer">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="redBtn">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- get pre approved modal ends -->
+
+
+<hr class="boatDetailPageSeparator">
+
+<!-- similar listing section starts here -->
+<section>
+	<div class="container-fluid">
+		<div class="row m-0">
+			<div class="col-lg-11 mx-auto">
+				<div class="similarListingHeadingWrap">
+					<h2 class="similar-heading text-center text-lg-left">Similar Listings</h2>
+				</div>
+
+				<div class="similar-boats-box">
+					{{#each belowproducts1}}
+					<div class="grid-boat-card grid-view">
+
+						<div class="grid-boat-img-box">
+
+							<div class="boat-card-img">
+								{{#ifCond this.boat_condition '==' 'New'}}
+								<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}">
+									<img src="{{this.productImage }}" class="boat-img"
+										alt="{{imgAlt 'boat-detail-this-6' 'This'}}" data-alt-key="boat-detail-this-6"Boats' ''}}">
+								</a>
+								{{/ifCond}}
+
+								{{#ifCond this.boat_condition '==' 'Used'}}
+								<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}">
+									<img src="{{this.productImage }}" class="boat-img"
+										alt="{{imgAlt 'boat-detail-this-7' 'This'}}" data-alt-key="boat-detail-this-7"Boats' ''}}">
+								</a>
+								{{/ifCond}}
+
+								{{#ifCond this.saleStatusTitle "==" "Pending Sale"}}<span
+									class="grid-pending_sale_banner">Pending Sale</span>{{/ifCond}}
+
+							</div>
+
+						</div>
+
+						<div class="grid-boat-content-box">
+							<div class="grid-upper-content-box">
+
+								<div class="grid-sm-box-1">
+
+									{{#ifCond this.boat_condition '==' 'New'}}
+									<h2 class="grid-boat-title">
+										<a
+											href="/new-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+									</h2>
+									{{/ifCond}}
+
+									{{#ifCond this.boat_condition '==' 'Used'}}
+									<h2 class="grid-boat-title">
+										<a
+											href="/used-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+									</h2>
+									{{/ifCond}}
+
+									<div class="grid-boat-condition-box">
+
+										<div class="grid-price-box">
+											{{!-- {{#if this.boatPrice}}
+											<ul>
+												<li class="grid-price-item">${{thousandSeprator this.boatPrice}} </li>
+												<li class="grid-price-item">{{CalculatePaymentFromBoatPrice this.boatPrice}}/mo*</li>
+											</ul>
+											{{/if}} --}}
+
+											{{#if this.boatPrice}}
+												<ul>
+													
+													<li class="grid-price-item">${{thousandSeprator this.boatPrice}}</li>
+													<li class="grid-price-item">{{CalculatePaymentFromBoatPrice this.boatPrice}}/mo*</li>
+													
+												</ul>
+
+													{{else}}
+
+													{{#ifCond this.boat_condition '==' 'New'}}
+
+														<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+
+													{{/ifCond}}
+
+													{{#ifCond this.boat_condition '==' 'Used'}}
+
+														<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+
+													{{/ifCond}} 
+
+												{{/if}}
+
+
+										</div>
+										<ul class="grid-boat-condition-list">
+
+											{{#if this.boat_condition}}
+											<li class="specs-list-item"> <img
+													src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/condition.png"
+													alt="{{imgAlt 'boat-detail-similar-condition-icon' 'Condition'}}" data-alt-key="boat-detail-similar-condition-icon"> {{this.boat_condition}}</li>
+											{{/if}}
+											{{#if this.boat_length}}
+											<li class="specs-list-item"> <img
+													src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-1.png"
+													alt="{{imgAlt 'boat-detail-similar-length-icon' 'Boat Length'}}" data-alt-key="boat-detail-similar-length-icon"> {{this.boat_length}}'</li>
+											{{/if}}
+											{{#if this.engine_hours}}
+											<li class="specs-list-item"><img
+													src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+													alt="{{imgAlt 'boat-detail-similar-hours-icon' 'Engine Hours'}}" data-alt-key="boat-detail-similar-hours-icon"> {{this.engine_hours}} hrs</li>
+											{{/if}}
+											
+											{{!-- {{#if this.stock_number}}
+											<li class="specs-list-item"><img
+													src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/stock-no.png" class="stock-img"
+													alt="{{imgAlt 'boat-detail-stock-no' 'Stock No'}}" data-alt-key="boat-detail-stock-no"> {{this.stock_number}} </li>
+											{{/if}} --}}
+
+
+										</ul>
+									</div>
+
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+					{{/each}}
+				</div>
+
+				<div class="owl-carousel similar-slider owl-theme">
+					{{#each belowproducts1}}
+					<div class="item">
+
+						<div class="grid-boat-card grid-view">
+
+							<div class="grid-boat-img-box">
+
+								<div class="boat-card-img">
+									{{#ifCond this.boat_condition '==' 'New'}}
+									<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}">
+										<img src="{{this.productImage }}" class="boat-img"
+											alt="{{imgAlt 'boat-detail-this-8' 'This'}}" data-alt-key="boat-detail-this-8"Boats' ''}}">
+									</a>
+									{{/ifCond}}
+
+									{{#ifCond this.boat_condition '==' 'Used'}}
+									<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}">
+										<img src="{{this.productImage }}" class="boat-img"
+											alt="{{imgAlt 'boat-detail-this-9' 'This'}}" data-alt-key="boat-detail-this-9"Boats' ''}}">
+									</a>
+									{{/ifCond}}
+
+									{{#ifCond this.saleStatusTitle "==" "Pending Sale"}}<span
+										class="grid-pending_sale_banner">Pending Sale</span>{{/ifCond}}
+
+								</div>
+
+							</div>
+
+							<div class="grid-boat-content-box">
+								<div class="grid-upper-content-box">
+
+									<div class="grid-sm-box-1">
+
+										{{#ifCond this.boat_condition '==' 'New'}}
+										<h2 class="grid-boat-title">
+											<a
+												href="/new-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+										</h2>
+										{{/ifCond}}
+
+										{{#ifCond this.boat_condition '==' 'Used'}}
+										<h2 class="grid-boat-title">
+											<a
+												href="/used-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+										</h2>
+										{{/ifCond}}
+
+										<div class="grid-boat-condition-box">
+
+											<div class="grid-price-box">
+
+												{{!-- {{#if this.boatPrice}}
+												<ul>
+													<li class="grid-price-item">${{thousandSeprator this.boatPrice}} </li>
+													<li class="grid-price-item">{{CalculatePaymentFromBoatPrice this.boatPrice}}/mo*</li>
+												</ul>
+												{{else}}
+													<ul>
+														<li class="grid-price-item">Request Pricing </li>
+													</ul>
+												{{/if}} --}}
+
+												
+													{{#if this.boatPrice}}
+													<ul>
+														
+														<li class="grid-price-item">${{thousandSeprator this.boatPrice}}</li>
+														<li class="grid-price-item">{{CalculatePaymentFromBoatPrice this.boatPrice}}/mo*</li>
+														
+													</ul>
+
+														{{else}}
+
+														{{#ifCond this.boat_condition '==' 'New'}}
+
+															<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+
+														{{/ifCond}}
+
+														{{#ifCond this.boat_condition '==' 'Used'}}
+
+															<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+
+														{{/ifCond}} 
+
+													{{/if}}
+												
+
+											</div>
+											<ul class="grid-boat-condition-list">
+
+												{{#if this.boat_condition}}
+												<li class="specs-list-item"> <img
+														src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/condition.png"
+														alt="{{imgAlt 'boat-detail-similar-condition-icon' 'Condition'}}" data-alt-key="boat-detail-similar-condition-icon"> {{this.boat_condition}}</li>
+												{{/if}}
+												{{#if this.boat_length}}
+												<li class="specs-list-item"> <img
+														src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-1.png"
+														alt="{{imgAlt 'boat-detail-similar-length-icon' 'Boat Length'}}" data-alt-key="boat-detail-similar-length-icon"> {{this.boat_length}}'</li>
+												{{/if}}
+												{{#if this.engine_hours}}
+												<li class="specs-list-item"><img
+														src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+														alt="{{imgAlt 'boat-detail-similar-hours-icon' 'Engine Hours'}}" data-alt-key="boat-detail-similar-hours-icon"> {{this.engine_hours}} hrs</li>
+												{{/if}}
+												{{!-- {{#if this.stock_number}}
+												<li class="specs-list-item"><img
+														src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/stock-no.png" class="stock-img"
+														alt="{{imgAlt 'boat-detail-stock-no-2' 'Stock No'}}" data-alt-key="boat-detail-stock-no-2"> {{this.stock_number}} </li>
+												{{/if}} --}}
+
+
+											</ul>
+										</div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+					{{/each}}
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+</section>
+
+<div class="mob-sticky-bar">
+	<div class="sticky-bar-col">
+		<h3>{{results.boatTitle}}</h3>
+
+		{{#if results.boatPrice}}
+			{{{priceLogic results.MSRP results.boatPrice}}}
+		{{else}}
+			<p>Request Pricing</p>
+		{{/if}}
+	</div>
+
+	<div class="sticky-bar-col text-right">
+		<a href="#dealer-form">Contact Dealer</a>
+	</div>
+</div>
+
+<!-- similar listing section ends here -->
+<!-- boat detail page ends here -->
+
+
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel"
+	aria-hidden="false">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content own_new_style gtm_form" id="offer-price-boat" data-form-id="VDP Offer Price Boat Form" style="background: #f7f7f7;">
+			<div class="modal-header">
+				<h5 class="modal-title pull-left" id="paymentModalLabel">CALCULATE PAYMENT</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+
+			<div class="modal-body CustomForm">
+				<div class="row">
+
+
+					<div class="col-sm-12 col-md-12">
+						<p style="display: none; padding: 10px;" class="notify_popup_message alert alert-danger"></p>
+
+						<div class="col-sm-12 clearfix form-group">
+							<label id="BoatPricelabel" for="BoatPrice" class="popup_label">Boat Price</label>
+							<input class="popup_input form-control" aria-labelledby="BoatPricelabel"
+								id="cal-total-loan-amount" type="text" placeholder="$" required />
+						</div>
+
+						<div class="col-sm-12 clearfix form-group">
+							<label id="DownPaymentlabel" for="DownPayment" class="popup_label">Down Payment</label>
+							<input class="popup_input form-control" aria-labelledby="DownPaymentlabel"
+								id="cal-down-payment" type="text" placeholder="$" required />
+						</div>
+					</div>
+
+
+					<div class="col-sm-12 col-md-12">
+
+						<div class="col-sm-12 clearfix form-group">
+							<label id="Termlabel" for="Term" class="popup_label">Term (Years)</label>
+							<input onchange="numeric(this)" aria-labelledby="Termlabel" class="popup_input form-control"
+								id="cal-loan-period" type="text" placeholder="" required />
+						</div>
+
+
+						<div class="col-sm-12 clearfix form-group">
+							<label id="InterestLabel" for="Interest" class="popup_label">Interest (%)</label>
+							<input onchange="validateFloat(this)" aria-labelledby="InterestLabel"
+								class="popup_input form-control" id="cal-interest-rate" type="text" placeholder=""
+								required />
+							<input type="hidden" id="cal-result-value" value="" />
+						</div>
+					</div>
+
+
+					<div class="col-md-12 col-sm-12 col-xs-12 text-center">
+						<p class="note_para">
+							Note: Taxes and freight & prep fees are included in the calculation.
+						</p>
+					</div>
+
+
+					<div class="col-md-12 col-sm-12 col-xs-12 form-group">
+						<div class="submit_btn_box text-center">
+							<button id="monthly_payment_calculate_form_btn"
+								class="custom_btn submit_btn_popup customBtn custom-pop-btn">
+								Calculate
+							</button>
+						</div>
+					</div>
+
+
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div id="monthly_payment_container" class="result_box text-center">
+							
+							<h2 style="margin: 0;" class="formHeading">Estimated monthly payment:</h2>
+							<h3 style="margin: 0;" class="formHeading" id="monthly_payment_text">
+								$544.32 <span>/mo for 240 months.</span>
+							</h3>
+							<p>*Monthly payment is subject to change based on finance application variables.</p>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<div id="make_an_offer_btn_div" class="CustomForm">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12 col-md-12" id="">
+
+
+							<div class="col-sm-12 clearfix form-group">
+								<label id="mou_FirstNameLabel" for="first_usr_name" class="popup_label">First
+									Name</label>
+								<input class="popup_input form-control require_check" id="first_usr_name"
+									name="first_usr_name" aria-label="mou_FirstNameLabel" type="text" placeholder="" />
+								<div class="field-error" id="error_first_usr_name"></div>
+								<input class="popup_input form-control" id="boat_url" name="boat_url"
+									value="{{config.baseUrl}}/{{page_slug}}/{{#if results.boatPermalink}}{{results.boatPermalink}}{{else}}{{results._id}}{{/if}}"
+									type="hidden" aria-label="mou_FirstNameLabel" placeholder="" />
+								<input class="popup_input form-control" id="boat_name" name="boat_name"
+									value="{{results.boatTitle}}" type="hidden" aria-label="mou_FirstNameLabel"
+									placeholder="" />
+							</div>
+
+							<div class="col-sm-12 clearfix form-group">
+								<label id="mou_LastNameLabel" for="last_usr_name" class="popup_label">Last Name</label>
+								<input class="popup_input form-control require_check" id="last_usr_name" type="text"
+									name="last_usr_name" aria-label="mou_LastNameLabel" placeholder="" />
+								<div class="field-error" id="error_last_usr_name"></div>
+							</div>
+
+
+							<div class="col-sm-12 clearfix form-group">
+								<label id="mao_EmailLabel" for="email_usr" class="popup_label">Email</label>
+								<input class="popup_input form-control require_check" id="email_usr" name="email_usr"
+									type="email" aria-label="mao_EmailLabel" placeholder="" />
+								<div class="field-error" id="error_email_usr"></div>
+							</div>
+
+
+							<div class="col-sm-12 clearfix form-group">
+								<label id="mao_PhoneLabel" for="phone_num" class="popup_label">Phone</label>
+								<input class="popup_input form-control phoneInput require_check" id="phone_num"
+									name="phone_num" type="tel" aria-label="mao_PhoneLabel" />
+								<div class="field-error" id="error_phone_num"></div>
+								<input type="hidden" value="" />
+							</div>
+
+							<div class="col-md-12 message_text clearfix form-group">
+								<label id="mao_CommentsLabel" for="mf_comments">Comments</label>
+								<textarea name="comments" id="mf_comments" aria-label="mao_CommentsLabel"
+									class="form-control require_check"></textarea>
+								<div class="field-error" id="error_mf_comments"></div>
+							</div>
+							<input type="text" name="honeypot" id="honeypot" style="display: none;">
+							{{> utm}}
+
+							<div class="col-xs-12 text-center clearfix">
+								<div class="submit_btn_box">
+									<button class="custom_btn submit_btn_popup customBtn custom-pop-btn gtm_form_submit"
+										data-form-id="VDP Offer Price Boat Form"
+										title="Make an Offer Button" id="submit_offer_btn">
+										Submit Offer
+									</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-md-3">
+
+
+
+	<div class="modal fade" id="contactModal_email" tabindex="-1" role="dialog"
+		aria-labelledby="contactModal_emailLabel" aria-hidden="false" style="display: none;">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content own_new_style">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h5 class="shareModalHeading mb-3">COPY LINK</h5>
+					<div class="copyLinkWrapper">
+						<input class="popup_input" aria-labelledby="share-messageLabel" type="text" id="share-message"
+							value="{{pageUrl}}" readonly>
+						<button class="copyShareLinkBtn">COPY</button>
+					</div>
+
+					<div class="shareIconsWrapper">
+						<h5 class="shareModalHeading mb-3">SHARE</h5>
+
+						<div class="shareIconsContainer">
+							<a class="shareIcons" href="https://www.facebook.com/sharer/sharer.php?u={{pageUrl}}"
+								target="_blank">
+								<i class="fa-brands fa-facebook-f"></i>
+							</a>
+							<a class="shareIcons" href="https://twitter.com/intent/tweet?url={{pageUrl}}"
+								target="_blank">
+								<i class="fa-brands fa-x-twitter"></i>
+							</a>
+							<a class="shareIcons" href="https://pinterest.com/pin/create/button/?url={{pageUrl}}"
+								target="_blank">
+								<i class="fa-brands fa-pinterest"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="col-xs-12 col-sm-6 col-md-3">
+	<div class="modal fade" id="contactModal_phone" tabindex="-1" role="dialog"
+		aria-labelledby="contactModal_PhoneLabel" aria-hidden="false" style="display:none;">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="contactModal_PhoneLabel">Share Boat on mobile number</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<form id='phone-boat'>
+							<div class="col-sm-12 col-md-12">
+
+								<div class="col-sm-6 col-md-6">
+									<label id="SendToLabel" for="SendTo" class="popup_label ">Send To <span
+											class="compulsory_color"> *</span></label>
+
+									<input class="popup_input form-control" aria-labelledby="SendToLabel" id="text_to"
+										placeholder="+19161234567" type="tel" required>
+								</div>
+
+
+								<div class="col-sm-6 col-md-6">
+									<label id="MessageLabel" for="Message" class="popup_label ">Message</label>
+									<textarea rows="5" class="popup_input form-control" aria-labelledby="MessageLabel"
+										id="phone_message"> Take a look at this boat at Idaho Water Sports: {{pageUrl}}</textarea>
+									<div style="text-align:center;">
+										{{#if images}}
+										{{#each images as |value|}}
+										{{#ifCond value.featured '==' 1}}
+										<img alt="{{imgAlt 'boat-detail-share-preview' 'Boat Preview Image'}}" data-alt-key="boat-detail-share-preview" id="timage" style="width:100%" src="{{value.image}}" />
+										{{/ifCond}}
+										{{/each}}
+										{{/if}}
+									</div>
+
+								</div>
+
+							</div>
+							<div class="submit_btn_box">
+								<button id="phone-d" type="submit" class="custom_btn submit_btn_popup"
+									data-dismiss="modal">Send</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="myModal3" data-backdrop="static" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" onclick="confirmRemove('myModal3')">&times;</button>
+				</div>
+				<div id="iframeHolder3"></div>
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="desclaimer" tabindex="-1" aria-labelledby="desclaimerLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title" id="desclaimerLabel">Disclamer</h2>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>With approved credit. Terms may vary. Tax, Title, and Registration included in prices shown and must
+					be paid by the purchaser*. Please verify information with your local Idaho Water Sports or Idaho Water Sports.
+					Subject to change</p>
+				<p>*Excludes used and brokerage boats.</p>
+			</div>
+			<div class="modal-footer">
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade disclaimer-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+		<h5 class="modal-title" id="exampleModalLabel">Disclaimer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        By submitting this form, you agree to be contacted by our dealership, including via phone, email, and text message. Message and data rates may apply. Consent is not a condition of purchase. Your information will be used in accordance with our privacy policy. 
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="value_ur_trade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelContact" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabelContact">Value Your Trade</h5>
+            <button type="button" class="btn-close close" data-dismiss="modal" aria-label="Close">
+            {{!-- <span aria-hidden="true">&times;</span> --}}
+            </button>
+         </div>
+         <div class="modal-body">
+            <!-- This element is in place to support the Digital Power Solutions TRADE CYCLE service this dealer pays for. To adjust this service IN ANY WAY or for questions on design/implementation, please contact the DigitalPower.Solutions support team (email support@ at our domain name). --><!-- PLEASE, DO NOT OVERRIDE WITH CUSTOM CSS (IN *ANY* WAY), REMOVE, OR COMMENT THIS CODE OUT WITHOUT CONTACTING US. -->
+            <div id="dpstac_tauc2-1010">
+               <iframe src="https://app.digitalpowersolutions.net/idaho-water-sports-idaho-falls/icode/p1w2bFg513fIq" width="100%" height="1200px" frameborder="0" id="iframe_id"></iframe>
+            </div>
+            <!-- ////////////// DPS Solutions Platform by Digital Power Solutions - Licensed under the protection of U.S. Intellectual Property as well as U.S. and International Copyright Law - All Rights reserved ///////////// -->
+         </div>
+      </div>
+   </div>
+</div>
+
+
+<script>
+	function myFunction(imgs) {
+		// Get the expanded image
+		var expandImg = document.getElementById("main_image");
+		// Get the image text
+		var imgText = document.getElementById("imgtext");
+		// Use the same src in the expanded image as the image being clicked on from the grid
+		expandImg.src = imgs.src;
+		// Use the value of the alt attribute of the clickable image as text inside the expanded image
+		imgText.innerHTML = imgs.alt;
+		// Show the container element (hidden with CSS)
+		expandImg.parentElement.style.display = "block";
+	}
+</script>
+<style>
+	.linkwrap {
+		position: relative;
+		display: inline-block;
+	}
+
+	.blocker {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		z-index: 1;
+		background: rgba(255, 0, 0, 0);
+	}
+
+	.linkwrap iframe {
+		z-index: 2;
+	}
+</style>
+
+<script>
+
+	document.addEventListener("DOMContentLoaded", function () {
+		// Select all elements with the class .phoneInput
+		const phoneInputFields = document.querySelectorAll(".phoneInput");
+		console.log(phoneInputFields)
+
+		// Initialize intl-tel-input on each field
+		phoneInputFields.forEach(function (phoneInputField) {
+			const iti = window.intlTelInput(phoneInputField, {
+				utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+				initialCountry: "us", // Uncomment and set initial country if needed
+			});
+
+			// Attach the intlTelInput instance to the input field
+			phoneInputField.iti = iti;  // Store the instance on the input field
+		});
+	});
+
+
+
+	function handleKeyPress(event) {
+		if (event.key === 'Enter' || event.keyCode === 13) {
+			huggingFaceChat();
+		}
+	}
+
+	function huggingFaceChat() {
+		let data = {
+			boat: '2024 mastercraft x10',
+			question: document.getElementById('askMeAboutBoat').value
+		}
+		const requestOptions = {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		};
+		document.getElementById('loading_gif').style.display = 'block';
+		fetch(`https://boat-ai-python.onrender.com/chat/${data.question}`, requestOptions)
+			.then(response => {
+				if (response.ok) {
+					return response.text();
+				} else {
+					throw new Error('POST request failed');
+				}
+			})
+			.then(data => {
+				if (data) {
+					document.getElementById('loading_gif').style.display = 'none';
+					console.log(data.result)
+					document.getElementById('hugging_face_ans').innerHTML = data
+				}
+				else {
+					console.log(data);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	}
+
+
+	function Demography(element, first) {
+		console.log(`{{results.boatPermalink}}`)
+		let data = {
+			demography: first,
+			json: true
+		}
+		element.querySelector('.viewCard').classList.add('active')
+		document.querySelectorAll('.viewCard').forEach(item => {
+			if (item !== element.querySelector('.viewCard')) {
+				item.classList.remove('active');
+			}
+		})
+		const requestOptions = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		};
+		fetch(`/{{page_slug}}/{{results.boatPermalink}}`, requestOptions)
+			.then(response => {
+				if (response.ok) {
+					return response.json();
+				} else {
+					throw new Error('POST request failed');
+				}
+			})
+			.then(data => {
+				if (data.success) {
+					document.getElementById('aiHighlightDisable').style.display = 'none';
+					document.getElementById('aiHighlight').innerHTML = data.highlight;
+					document.getElementById('aidescriptionDisable').style.display = 'none';
+					document.getElementById('aidescription').innerHTML = data.description;
+					console.log('success');
+					console.log(data)
+				}
+				else {
+					console.log(data);
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	}
+</script>

@@ -27,9 +27,20 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <!-- Inventory filter stylesheet (74KB) -->
     <link rel="stylesheet" href="/assets/css/inventory-style.css">
+    <!-- OwlCarousel (for boat detail page image carousel) -->
+    <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/assets/css/owl.theme.default.min.css">
+    <!-- Slick slider (for boat detail page mobile view) -->
+    <link rel="stylesheet" href="/assets/plugins/slick.css">
+    <link rel="stylesheet" href="/assets/plugins/slick-theme.css">
+    <!-- Fancybox (for boat detail page image lightbox) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.css">
 
     <!-- jQuery loads in <head> so body scripts can use $ immediately -->
     <script src="/assets/js/jquery.min.js"></script>
+    
+    <!-- See360 360-degree viewer (loaded once, site-wide) -->
+    <script src="https://cdn.see360.ai/viewer/v1/see360.js" data-api-key="sk_e7a4d48bbedd7d34d2a56c2007dc2a2f7a066de59f2cd384dbb915f839545433"></script>
 
     <!--
         applyView stub defined in <head> so inventory-results.js can safely
@@ -108,6 +119,16 @@
 <script src="/assets/js/inventory-filter-controls.js"></script>
 <script src="/assets/js/inventory-results.js"></script>
 <script src="/assets/js/custom.js"></script>
+<!-- OwlCarousel (for boat detail page image carousel) -->
+<script src="/assets/js/owl.carousel.min.js"></script>
+<!-- Slick slider (for boat detail page mobile view) -->
+<script src="/assets/plugins/slick.js"></script>
+<!-- Fancybox (for boat detail page image lightbox) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.js"></script>
+<!-- Cleave.js for phone input formatting (boat detail contact form) -->
+<script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/addons/cleave-phone.us.js"></script>
+<script src="/assets/js/phone-format-init.js"></script>
 
 <!--
     Load More handler — copied EXACTLY from reference repo views/layouts/layout.hbs lines 823-865.

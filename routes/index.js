@@ -643,7 +643,7 @@ router.all(boatListingPaths, (req, res, next) => {
 
                     var link = (boat.boat_condition === 'New')
                         ? '/new-boats-for-sale-detail/' + boat.boatPermalink
-                        : '/used-pre-owned-boats-for-sale-detail/' + boat.boatPermalink;
+                        : '/used-boats-for-sale-detail/' + boat.boatPermalink;
 
                     var boatimg = boat.productImage
                         ? boat.productImage
@@ -813,6 +813,223 @@ router.all(boatListingPaths, (req, res, next) => {
             console.error('Error getting boat data:', err);
             return res.status(500).render('error', { title: 'Error', message: 'Failed to load boats' });
         });
+});
+
+// ---------------------------------------------------------------------------
+// Redirect legacy "used-pre-owned" detail page URLs to the canonical "used" detail path.
+// Copied from reference project: routes/inventory-filter.js lines 56-58
+// e.g. /used-pre-owned-boats-for-sale-detail/2021-mastercraft-x24-123
+//   → /used-boats-for-sale-detail/2021-mastercraft-x24-123
+// ---------------------------------------------------------------------------
+router.get('/used-pre-owned-boats-for-sale-detail/:id', (req, res) => {
+    res.redirect(301, '/used-boats-for-sale-detail/' + req.params.id);
+});
+
+// ---------------------------------------------------------------------------
+// Boat detail page routes
+// Updated for Express 5.x: using multiple routes instead of regex parameter syntax
+// Note: URL behavior matches reference project exactly - same paths, same parameters
+// Simplified: removed sold_boats fallback, specials matching, schema builders, getImages
+// ---------------------------------------------------------------------------
+
+const boatDetailPaths = [
+    '/new-boats-for-sale-detail/:id',
+    '/used-boats-for-sale-detail/:id',
+    '/boats-for-sale-detail/:id',
+];
+
+// Boat detail handler function (shared by all routes)
+async function handleBoatDetail(req, res) {
+    try {
+        console.log(`[Boat Detail] Request: ${req.path}, ID: ${req.params.id}`);
+        let db = req.app.db;
+        let config = req.app.config;
+        // Extract page_slug from the URL path to match reference behavior
+        let page_slug = req.path.split('/')[1]; // e.g., 'new-boats-for-sale-detail'
+        let filter = {};
+
+        if (req.params.id.includes("-")) {
+            filter = { boatPermalink: req.params.id };
+        } else {
+            filter = { _id: common.getId(req.params.id) };
+        }
+        console.log(`[Boat Detail] Filter:`, filter);
+
+        var styles = common.getMainPageStyles();
+        styles.push({ url: 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css', comment: '' });
+        var scripts = common.getDockingPageScripts();
+
+        const result = await db.boats.findOne(filter);
+        console.log(`[Boat Detail] Found boat:`, result ? result.boatTitle : 'NOT FOUND');
+
+        if (!result) {
+            console.log('[Boat Detail] Rendering 404 error');
+            // Fetch menus for error page
+            const [menu, footerMenu, inventoryMenu] = await Promise.all([
+                common.getMenu(db),
+                common.selectMenu(db, 'footer_menu'),
+                common.getInventoryMenu(db)
+            ]);
+
+            return res.status(404).render('error', {
+                title: 'Not found',
+                message: 'Boat not found',
+                helpers: req.handlebars.helpers,
+                config,
+                scripts,
+                styles,
+                showFooter: true,
+                menu,
+                footerMenu,
+                inventoryMenu,
+            });
+        }
+
+        // JSON API mode
+        if (req.query.json === 'true') {
+            res.status(200).json(result);
+            return;
+        }
+
+        let boatOptions = {};
+        if (result.boatOptions) {
+            try {
+                boatOptions = JSON.parse(result.boatOptions);
+            } catch (e) {
+                console.error('Error parsing boatOptions:', e);
+                boatOptions = {};
+            }
+        }
+
+        const currentBrand = result?.boat_brand?.trim() || result?.boat_make?.trim() || "";
+
+        // Get images using common.getImages (wrap in Promise with timeout)
+        const images = await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                console.error('getImages timeout - using boatImages from result');
+                resolve(result.boatImages || []);
+            }, 5000);
+
+            common.getImages(result._id, "boat", req, res, (imgData) => {
+                clearTimeout(timeout);
+                try {
+                    // Deduplicate images
+                    const uniqueImagesByUrl = (imageArr) => {
+                        const seen = new Set();
+                        return (imageArr || []).filter(img => {
+                            const key = img && (img.image || img._id || JSON.stringify(img));
+                            if (!key || seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    };
+
+                    result.boatImages = uniqueImagesByUrl(result.boatImages);
+                    resolve(uniqueImagesByUrl(imgData));
+                } catch (err) {
+                    console.error('Error processing images:', err);
+                    resolve(result.boatImages || []);
+                }
+            });
+        });
+
+        // Collect related boats
+        const belowproducts1 = await db.boats.find({ boat_brand: currentBrand, _id: { $ne: common.getId(result._id) } })
+            .sort({ CreatedDate: -1 })
+            .limit(4)
+            .toArray();
+
+        const belowBoats1 = await db.boats.find({}).sort({ CreatedDate: -1 }).limit(5).toArray();
+
+        // Handle YouTube embeds
+        let video_url_1 = result.Video1;
+        let video_url_2 = result.Video2;
+        let video_url_3 = result.Video3;
+        let video_url_4 = result.Video4;
+
+        [video_url_1, video_url_2, video_url_3, video_url_4] = [video_url_1, video_url_2, video_url_3, video_url_4].map(v => {
+            if (v && v.includes('watch?v=')) {
+                return v.replace('watch?v=', 'embed/');
+            }
+            return v;
+        });
+
+        // Collect other videos from video_url array
+        var all_array = [];
+        let all_videos = result.video_url || [];
+        if (all_videos.length > 0) {
+            all_videos.forEach(item => {
+                if (item.includes('youtu.be')) {
+                    let id = item.split('/')[3];
+                    all_array.push({
+                        type: "video",
+                        video: 'https://www.youtube.com/watch?v=' + id,
+                        image: `https://img.youtube.com/vi/${id}/0.jpg`
+                    });
+                }
+            });
+        }
+
+        // Get closest contact location
+        const closestContact = common.getClosestLocation(req);
+        closestContact.phoneRaw = closestContact.phone.replace(/-/g, '');
+
+        // Fetch menus
+        const [menu, footerMenu, inventoryMenu] = await Promise.all([
+            common.getMenu(db),
+            common.selectMenu(db, 'footer_menu'),
+            common.getInventoryMenu(db)
+        ]);
+
+        res.render(`themes/material/boat_detail`, {
+            title: result.boatTitle,
+            titleboat: result.boatTitle,
+            metaDescription: result.boatDescription || `Check out this ${result.boatTitle} for sale`,
+            boat_videos: all_array,
+            boat_videos_length: all_array.length,
+            url: req.params.id,
+            results: result,
+            boatOptions,
+            images,
+            page_slug,
+            page: 'boat_detail',
+            closestContact,
+            Video1: video_url_1,
+            Video2: video_url_2,
+            Video3: video_url_3,
+            Video4: video_url_4,
+            boatDescription: result.boatDescription,
+            pageCloseBtn: common.showCartCloseBtn('boat'),
+            config,
+            belowBoats1,
+            belowproducts1,
+            session: req.session,
+            pageUrl: config.baseUrl + req.originalUrl,
+            message: common.clearSessionValue(req.session, 'message'),
+            messageType: common.clearSessionValue(req.session, 'messageType'),
+            helpers: req.handlebars.helpers,
+            showFooter: 'showFooter',
+            menu,
+            footerMenu,
+            inventoryMenu,
+            scripts,
+            styles,
+        });
+        console.log('[Boat Detail] Render complete');
+    } catch (err) {
+        console.error('Error in handleBoatDetail:', err);
+        return res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to load boat details: ' + err.message,
+            helpers: req.handlebars.helpers,
+            config: req.app.config,
+        });
+    }
+}
+
+// Register the handler for all boat detail paths
+boatDetailPaths.forEach(path => {
+    router.all(path, handleBoatDetail);
 });
 
 module.exports = router;

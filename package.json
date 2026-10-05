@@ -20,6 +20,7 @@
     "express": "^5.2.1",
     "express-handlebars": "^9.0.1",
     "express-session": "^1.19.0",
+    "geoip-lite": "^1.4.10",
     "hbs": "^4.3.1",
     "mongodb": "^7.7.0",
     "request": "^2.88.2",
