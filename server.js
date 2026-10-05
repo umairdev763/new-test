@@ -334,6 +334,24 @@ const hbs = exphbs.create({
                 return "";
             }
         },
+
+        // {{utmQueryString session}} — build a UTM query string from session
+        // Returns "?utm_source=X&utm_medium=Y&..." if any UTM values exist,
+        // or an empty string if none are present.
+        utmQueryString: function(session) {
+            try {
+                if (!session || !session.utm) return "";
+                const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+                const parts = [];
+                UTM_KEYS.forEach(function(key) {
+                    const val = session.utm[key];
+                    if (val) parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
+                });
+                return parts.length ? '?' + parts.join('&') : '';
+            } catch (e) {
+                return "";
+            }
+        },
     },
 });
 

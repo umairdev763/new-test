@@ -372,7 +372,7 @@
 
 									<div class="boat-img-box">
 
-										<a href="/{{#ifCond boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-boats-for-sale-detail{{/ifCond}}/{{boatPermalink}}">
+										<a href="/{{#ifCond boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-boats-for-sale-detail{{/ifCond}}/{{boatPermalink}}{{utmQueryString ../session}}">
 											<img src="{{#if productImage}}{{productImage}}{{else}}https://cdn.mdsbrand.com/madis/assets/images/no_image_available.jpg{{/if}}" class="boat-img" alt="{{imgAlt 'boats-if' 'If'}}">
 										</a>
 										{{#if this.note}}
@@ -390,14 +390,14 @@
 												{{#ifCond this.boat_condition '==' 'New'}}
 												<h2 class="boat-title">
 													<a
-														href="/new-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+														href="/new-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}">{{this.boatTitle}}</a>
 												</h2>
 												{{/ifCond}}
 
 												{{#ifCond this.boat_condition '==' 'Used'}}
 												<h2 class="boat-title">
 													<a
-														href="/used-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+														href="/used-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}">{{this.boatTitle}}</a>
 												</h2>
 												{{/ifCond}}
 
@@ -465,13 +465,13 @@
 
 														<div>
 															{{#ifCond this.boat_condition '==' 'New'}}
-															<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}"
+															<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}"
 																class="listing-blue-btn">VIEW DETAILS</a>
 															{{/ifCond}}
 
 
 															{{#ifCond this.boat_condition '==' 'Used'}}
-															<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}"
+															<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}"
 																class="listing-blue-btn">VIEW DETAILS</a>
 															{{/ifCond}}
 
@@ -494,12 +494,12 @@
 												<div class="listing-desc">{{{this.boatDescription}}}
 
 													{{#ifCond this.boat_condition '==' 'New'}}
-													<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}"
+													<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}"
 														class="read-more">MORE BOAT DETAILS</a>
 													{{/ifCond}}
 
 													{{#ifCond this.boat_condition '==' 'Used'}}
-													<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}"
+													<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}"
 														class="read-more">MORE BOAT DETAILS</a>
 													{{/ifCond}}
 
@@ -521,7 +521,7 @@
 
 									<div class="grid-boat-img-box">
 
-										<a href="/{{#ifCond boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-boats-for-sale-detail{{/ifCond}}/{{boatPermalink}}">
+										<a href="/{{#ifCond boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-boats-for-sale-detail{{/ifCond}}/{{boatPermalink}}{{utmQueryString ../session}}">
 											<img src="{{#if productImage}}{{productImage}}{{else}}https://cdn.mdsbrand.com/madis/assets/images/no_image_available.jpg{{/if}}" class="boat-img" alt="{{imgAlt 'boats-if-2' 'If'}}">
 										</a>
 										{{#if this.note}}
@@ -539,14 +539,14 @@
 												{{#ifCond this.boat_condition '==' 'New'}}
 												<h2 class="grid-boat-title">
 													<a
-														href="/new-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+														href="/new-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}">{{this.boatTitle}}</a>
 												</h2>
 												{{/ifCond}}
 
 												{{#ifCond this.boat_condition '==' 'Used'}}
 												<h2 class="grid-boat-title">
 													<a
-														href="/used-boats-for-sale-detail/{{this.boatPermalink}}">{{this.boatTitle}}</a>
+														href="/used-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}">{{this.boatTitle}}</a>
 												</h2>
 												{{/ifCond}}
 
@@ -568,13 +568,13 @@
 
 															{{#ifCond this.boat_condition '==' 'New'}}
 
-																<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+																<a href="/new-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}" class="grid-view-details-btn"> View Details</a>
 
 															{{/ifCond}}
 
 															{{#ifCond this.boat_condition '==' 'Used'}}
 
-																<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}" class="grid-view-details-btn"> View Details</a>
+																<a href="/used-boats-for-sale-detail/{{this.boatPermalink}}{{utmQueryString ../session}}" class="grid-view-details-btn"> View Details</a>
 
 															{{/ifCond}} 
 
