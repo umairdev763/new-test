@@ -180,10 +180,8 @@ $(document).on('submit', '#boats_search_form', function (e) {
 
 // ---------------------------------------------------------------------------
 // Owl Carousel — .boat-detail-carosuel (desktop image carousel)
-// NOTE: The see360 inline script in boat_detail.hbs calls initCarousels() which
-// does a destroy+re-init after the gallery is un-hidden. This $(document).ready
-// block acts as the first initialisation; if the gallery is already visible
-// (see360 never ran / was removed before ready fired) it also works directly.
+// NOTE: Gallery is visible immediately so this first init measures full width.
+// See360 only replaces the gallery after a successful spin; a 404 leaves this carousel as-is.
 // ---------------------------------------------------------------------------
 $(document).ready(function () {
     if ($('.boat-detail-carosuel').length) {

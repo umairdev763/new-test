@@ -19,12 +19,24 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <!-- Font Awesome -->
+    <!-- Font Awesome 4 (icons used in filter sidebar) -->
     <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+    <!-- Font Awesome 6 (solid icons used in boat detail page — fa-solid fa-play etc.) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Google Fonts — Albert Sans, Inter, Montserrat (matches reference) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap">
+    <!-- Google Fonts — Public Sans -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap">
     <!-- jQuery UI slider theme -->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- intlTelInput — phone flag + formatting (boat detail contact form) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
     <!-- Main stylesheet (82KB — boats listing layout) -->
     <link rel="stylesheet" href="/assets/css/style.css">
+    <!-- styles.min.css — compiled theme bundle (matches reference /css/styles.min.css) -->
+    <link rel="stylesheet" href="/css/styles.min.css">
     <!-- Inventory filter stylesheet (74KB) -->
     <link rel="stylesheet" href="/assets/css/inventory-style.css">
     <!-- OwlCarousel (for boat detail page image carousel) -->
@@ -104,28 +116,25 @@
 {{{body}}}
 
 <!--
-    ── Script load order (mirrors reference repo exactly) ──────────────────────
-    1. jquery-ui.js              ← range sliders
-    2. jquery.ui.touch-punch.js  ← mobile slider support
-    3. inventory-filter-url.js   ← buildInventoryFilterUrl, updateBrowserUrl, updateFilterCounts
-    4. inventory-filter-controls.js ← filterCheckboxSelected, updateInventoryFilter, removeInventoryFilter, slider init
-    5. inventory-results.js      ← getBoats() — calls updateBrowserUrl + applyView at event-time
-    6. custom.js                 ← applyView (real impl), opacity fix, view toggle, sort, accordion, search, load more
+    ── Script load order ────────────────────────────────────────────────────────
+    Third-party libraries load FIRST so custom.js $(document).ready handlers
+    find them available when they fire.
     ────────────────────────────────────────────────────────────────────────────
 -->
 <script src="/assets/js/jquery-ui.js"></script>
 <script src="/assets/js/jquery.ui.touch-punch.min.js"></script>
+<!-- OwlCarousel — must load before custom.js carousel init -->
+<script src="/assets/js/owl.carousel.min.js"></script>
+<!-- Slick slider — must load before custom.js slick init -->
+<script src="/assets/plugins/slick.js"></script>
+<!-- Fancybox — local copy, must load before custom.js fancybox init -->
+<script src="/assets/js/fancybox/3.0.47/jquery.fancybox.min.js"></script>
+<!-- Filter JS — inventory-filter-url → controls → results → custom (in this order) -->
 <script src="/assets/js/inventory-filter-url.js"></script>
 <script src="/assets/js/inventory-filter-controls.js"></script>
 <script src="/assets/js/inventory-results.js"></script>
 <script src="/assets/js/custom.js"></script>
-<!-- OwlCarousel (for boat detail page image carousel) -->
-<script src="/assets/js/owl.carousel.min.js"></script>
-<!-- Slick slider (for boat detail page mobile view) -->
-<script src="/assets/plugins/slick.js"></script>
-<!-- Fancybox (for boat detail page image lightbox) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.js"></script>
-<!-- Cleave.js for phone input formatting (boat detail contact form) -->
+<!-- Phone formatting (boat detail contact form) -->
 <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/addons/cleave-phone.us.js"></script>
 <script src="/assets/js/phone-format-init.js"></script>

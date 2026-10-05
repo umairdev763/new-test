@@ -25,12 +25,13 @@
 	.sub-header{
 		display: none;
 	}
-	/* ── Gallery waits for see360: collapsed (not display:none) so the sliders still
-	   initialise at full width, then revealed if see360 has no spin for the boat ── */
-	.see360-gallery-pending {
-		height: 0;
-		overflow: hidden;
-		visibility: hidden;
+	/* Gallery stays visible and full-width so Owl/Slick measure correctly.
+	   See360 sits hidden until a spin actually loads; a 404 must not collapse the carousel. */
+	#see360ViewerWrapper {
+		display: none;
+	}
+	#see360ViewerWrapper.see360-ready {
+		display: block;
 	}
 	/* ── Boat Detail Video Thumbnail ── */
 	.boatDetailCarouselImageContainer .bd-video-link,
@@ -227,7 +228,7 @@
 				<div class="see360-viewer" data-vin="{{results.hullId}}" data-unit-id="{{results.Sales_force_Id}}"></div>
 			</div>
 
-			<div class="boat-detail-gallery see360-gallery-pending" id="boatDetailGallery">
+			<div class="boat-detail-gallery" id="boatDetailGallery">
 			<div class="owl-carousel-parent pb-2">
 				<div class="owl-carousel boat-detail-carosuel owl-theme">
 					{{#each results.boatImages}}
@@ -383,13 +384,9 @@
 			</div>
 
 			<script>
-				// see360 renders into .see360-viewer: a ".see360-error" box when it can't load a spin
-				// (no spin for this HIN/unit, missing identifiers, API error), or the viewer plus a
-				// ".see360-badge" on success. Keep whichever one applies and drop the other.
-				// Mirrored exactly from reference repo mean-idaho-master boat_detail.hbs —
-				// key difference: showGallery() destroys + re-inits carousels after un-hiding
-				// the gallery, because the sliders were initialised while the gallery had
-				// height:0 and therefore have zero-width measurements.
+				// See360 auto-inits .see360-viewer and 404s when there is no spin.
+				// Keep the image gallery visible (correct carousel width) and only swap
+				// to See360 after a successful badge. A failed spin must not collapse layout.
 				(function () {
 					var wrapper = document.getElementById('see360ViewerWrapper');
 					var gallery = document.getElementById('boatDetailGallery');
@@ -399,110 +396,67 @@
 					var settled = false;
 					var observer = new MutationObserver(check);
 
-					// Primary timeout — matches reference (15 s).
-					var timer = setTimeout(function () {
-						if (!viewer.querySelector('.see360-badge')) showGallery();
-					}, 15000);
-
 					function settle() {
 						settled = true;
 						observer.disconnect();
 						clearTimeout(timer);
 					}
 
-					function initCarousels() {
-						if (!window.jQuery) return;
-
-						// ── Owl Carousel (desktop) ──────────────────────────────────────
-						var $owl = jQuery('.boat-detail-carosuel');
-						if ($owl.length) {
-							// Destroy if already initialised with wrong dimensions
-							if ($owl.hasClass('owl-loaded')) {
-								$owl.trigger('destroy.owl.carousel');
-								$owl.removeClass('owl-loaded owl-text-select-on');
-							}
-							$owl.on('initialized.owl.carousel', function () {
-								// Remove fancybox from cloned slides to prevent duplicate lightbox entries
-								jQuery(this).find('.cloned [data-fancybox="gallery-detail-carousel"]').removeAttr('data-fancybox');
-							}).owlCarousel({
-								loop: true,
-								margin: 10,
-								nav: true,
-								responsive: {
-									0:    { items: 1 },
-									600:  { items: 1 },
-									1000: { items: 1 }
-								}
-							});
-						}
-
-						// ── Slick (mobile thumbnail nav) ────────────────────────────────
-						var $sliderFor = jQuery('.slider-for');
-						var $sliderNav = jQuery('.slider-nav');
-						if ($sliderFor.length && $sliderNav.length) {
-							if ($sliderFor.hasClass('slick-initialized')) $sliderFor.slick('unslick');
-							if ($sliderNav.hasClass('slick-initialized')) $sliderNav.slick('unslick');
-							$sliderFor.slick({
-								slidesToShow:   1,
-								slidesToScroll: 1,
-								arrows:         false,
-								fade:           true,
-								asNavFor:       '.slider-nav'
-							});
-							$sliderNav.slick({
-								slidesToShow:  3,
-								slidesToScroll: 1,
-								asNavFor:      '.slider-for',
-								dots:          true,
-								centerMode:    true,
-								focusOnSelect: true,
-								responsive: [
-									{ breakpoint: 767, settings: { slidesToShow: 2 } },
-									{ breakpoint: 450, settings: { slidesToShow: 2 } }
-								]
-							});
-						}
-					}
-
 					function showGallery() {
 						if (settled) return;
 						settle();
-						// Remove the see360 wrapper entirely
-						if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
-						// Un-hide the gallery (removes height:0 / visibility:hidden)
-						gallery.classList.remove('see360-gallery-pending');
-						// Re-initialise carousels now that the gallery has real dimensions.
-						// Use a short rAF delay so the browser has applied the class removal
-						// and the elements have their final widths before Owl/Slick measure them.
-						requestAnimationFrame(function () {
-							initCarousels();
-						});
+						if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+						if (window.jQuery) {
+							requestAnimationFrame(function () {
+								jQuery('.boat-detail-carosuel').trigger('refresh.owl.carousel');
+								if (jQuery('.slider-for').hasClass('slick-initialized')) {
+									jQuery('.slider-for, .slider-nav').slick('setPosition');
+								}
+							});
+						}
 					}
 
 					function showViewer() {
 						if (settled) return;
 						settle();
+						wrapper.classList.add('see360-ready');
 						if (gallery.parentNode) gallery.parentNode.removeChild(gallery);
 					}
 
 					function check() {
-						if (viewer.querySelector('.see360-error'))  showGallery();
+						if (viewer.querySelector('.see360-error')) showGallery();
 						else if (viewer.querySelector('.see360-badge')) showViewer();
 					}
 
-					observer.observe(viewer, { childList: true });
+					function isSee360Failure(err) {
+						var msg = err && (err.message || String(err)) || '';
+						return /spin data not available|see360|failed to initialize viewer/i.test(msg);
+					}
+
+					window.addEventListener('unhandledrejection', function (e) {
+						if (isSee360Failure(e.reason)) {
+							e.preventDefault();
+							showGallery();
+						}
+					});
+
+					window.addEventListener('error', function (e) {
+						if (isSee360Failure(e.error || e.message)) {
+							e.preventDefault();
+							showGallery();
+						}
+					}, true);
+
+					observer.observe(viewer, { childList: true, subtree: true });
 					check();
 
-					// Fallback A — See360 script blocked / offline: nothing will ever mutate the DOM.
+					var timer = setTimeout(function () {
+						if (!viewer.querySelector('.see360-badge')) showGallery();
+					}, 2500);
+
 					document.addEventListener('DOMContentLoaded', function () {
 						if (!window.See360) showGallery();
 					});
-
-					// Fallback B — See360 loaded but API returns 404 (no spin for this boat).
-					// The .see360-error child is injected asynchronously; give it 4 s then give up.
-					setTimeout(function () {
-						if (!settled) showGallery();
-					}, 4000);
 				})();
 			</script>
 
