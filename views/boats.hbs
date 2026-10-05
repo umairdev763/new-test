@@ -426,7 +426,16 @@
 														{{#if this.engine_hours}}
 														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
 																alt="{{imgAlt 'boats-listing-hours-icon' 'Engine Hours'}}" data-alt-key="boats-listing-hours-icon">Hours: <span> {{this.engine_hours}} hrs</span></li>
+														{{/if}}
 
+														{{#if this.engine_make}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png"
+																alt="{{imgAlt 'boats-listing-engine-make-icon' 'Engine Make'}}" data-alt-key="boats-listing-engine-make-icon">Engine: <span> {{this.engine_make}}</span></li>
+														{{/if}}
+
+														{{#if this.hourse_power}}
+														<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+																alt="{{imgAlt 'boats-listing-horse-power-icon' 'Horse Power'}}" data-alt-key="boats-listing-horse-power-icon">HP: <span> {{this.hourse_power}}</span></li>
 														{{/if}}
 
 														{{#if this.hullId}}
@@ -587,6 +596,16 @@
 														<li class="specs-list-item"><img
 																src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
 																alt="{{imgAlt 'boats-grid-hours-icon' 'Engine Hours'}}" data-alt-key="boats-grid-hours-icon"> {{this.engine_hours}} hrs</li>
+														{{/if}}
+														{{#if this.engine_make}}
+														<li class="specs-list-item"><img
+																src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png"
+																alt="{{imgAlt 'boats-grid-engine-make-icon' 'Engine Make'}}" data-alt-key="boats-grid-engine-make-icon"> {{this.engine_make}}</li>
+														{{/if}}
+														{{#if this.hourse_power}}
+														<li class="specs-list-item"><img
+																src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+																alt="{{imgAlt 'boats-grid-horse-power-icon' 'Horse Power'}}" data-alt-key="boats-grid-horse-power-icon"> {{this.hourse_power}} HP</li>
 														{{/if}}
 														{{#if this.hullId}}
 														<li class="specs-list-item"><img

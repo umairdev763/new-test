@@ -386,15 +386,20 @@
 				// see360 renders into .see360-viewer: a ".see360-error" box when it can't load a spin
 				// (no spin for this HIN/unit, missing identifiers, API error), or the viewer plus a
 				// ".see360-badge" on success. Keep whichever one applies and drop the other.
+				// Mirrored exactly from reference repo mean-idaho-master boat_detail.hbs —
+				// key difference: showGallery() destroys + re-inits carousels after un-hiding
+				// the gallery, because the sliders were initialised while the gallery had
+				// height:0 and therefore have zero-width measurements.
 				(function () {
 					var wrapper = document.getElementById('see360ViewerWrapper');
 					var gallery = document.getElementById('boatDetailGallery');
-					var viewer = wrapper && wrapper.querySelector('.see360-viewer');
+					var viewer  = wrapper && wrapper.querySelector('.see360-viewer');
 					if (!viewer || !gallery) return;
 
 					var settled = false;
 					var observer = new MutationObserver(check);
-					// Fallback if the see360 API never answers.
+
+					// Primary timeout — matches reference (15 s).
 					var timer = setTimeout(function () {
 						if (!viewer.querySelector('.see360-badge')) showGallery();
 					}, 15000);
@@ -405,35 +410,99 @@
 						clearTimeout(timer);
 					}
 
+					function initCarousels() {
+						if (!window.jQuery) return;
+
+						// ── Owl Carousel (desktop) ──────────────────────────────────────
+						var $owl = jQuery('.boat-detail-carosuel');
+						if ($owl.length) {
+							// Destroy if already initialised with wrong dimensions
+							if ($owl.hasClass('owl-loaded')) {
+								$owl.trigger('destroy.owl.carousel');
+								$owl.removeClass('owl-loaded owl-text-select-on');
+							}
+							$owl.on('initialized.owl.carousel', function () {
+								// Remove fancybox from cloned slides to prevent duplicate lightbox entries
+								jQuery(this).find('.cloned [data-fancybox="gallery-detail-carousel"]').removeAttr('data-fancybox');
+							}).owlCarousel({
+								loop: true,
+								margin: 10,
+								nav: true,
+								responsive: {
+									0:    { items: 1 },
+									600:  { items: 1 },
+									1000: { items: 1 }
+								}
+							});
+						}
+
+						// ── Slick (mobile thumbnail nav) ────────────────────────────────
+						var $sliderFor = jQuery('.slider-for');
+						var $sliderNav = jQuery('.slider-nav');
+						if ($sliderFor.length && $sliderNav.length) {
+							if ($sliderFor.hasClass('slick-initialized')) $sliderFor.slick('unslick');
+							if ($sliderNav.hasClass('slick-initialized')) $sliderNav.slick('unslick');
+							$sliderFor.slick({
+								slidesToShow:   1,
+								slidesToScroll: 1,
+								arrows:         false,
+								fade:           true,
+								asNavFor:       '.slider-nav'
+							});
+							$sliderNav.slick({
+								slidesToShow:  3,
+								slidesToScroll: 1,
+								asNavFor:      '.slider-for',
+								dots:          true,
+								centerMode:    true,
+								focusOnSelect: true,
+								responsive: [
+									{ breakpoint: 767, settings: { slidesToShow: 2 } },
+									{ breakpoint: 450, settings: { slidesToShow: 2 } }
+								]
+							});
+						}
+					}
+
 					function showGallery() {
 						if (settled) return;
 						settle();
-						wrapper.parentNode.removeChild(wrapper);
+						// Remove the see360 wrapper entirely
+						if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+						// Un-hide the gallery (removes height:0 / visibility:hidden)
 						gallery.classList.remove('see360-gallery-pending');
-						// The sliders were initialised while collapsed; re-measure them now they are visible.
-						if (window.jQuery) {
-							jQuery('.boat-detail-carosuel').trigger('refresh.owl.carousel');
-							jQuery('.slider-for.slick-initialized, .slider-nav.slick-initialized').slick('setPosition');
-						}
+						// Re-initialise carousels now that the gallery has real dimensions.
+						// Use a short rAF delay so the browser has applied the class removal
+						// and the elements have their final widths before Owl/Slick measure them.
+						requestAnimationFrame(function () {
+							initCarousels();
+						});
 					}
 
 					function showViewer() {
 						if (settled) return;
 						settle();
-						gallery.parentNode.removeChild(gallery);
+						if (gallery.parentNode) gallery.parentNode.removeChild(gallery);
 					}
 
 					function check() {
-						if (viewer.querySelector('.see360-error')) showGallery();
+						if (viewer.querySelector('.see360-error'))  showGallery();
 						else if (viewer.querySelector('.see360-badge')) showViewer();
 					}
 
 					observer.observe(viewer, { childList: true });
 					check();
-					// The see360 script itself failed to load (blocked, offline): nothing will ever render.
+
+					// Fallback A — See360 script blocked / offline: nothing will ever mutate the DOM.
 					document.addEventListener('DOMContentLoaded', function () {
 						if (!window.See360) showGallery();
 					});
+
+					// Fallback B — See360 loaded but API returns 404 (no spin for this boat).
+					// The .see360-error child is injected asynchronously; give it 4 s then give up.
+					setTimeout(function () {
+						if (!settled) showGallery();
+					}, 4000);
 				})();
 			</script>
 
@@ -1635,25 +1704,6 @@
 </style>
 
 <script>
-
-	document.addEventListener("DOMContentLoaded", function () {
-		// Select all elements with the class .phoneInput
-		const phoneInputFields = document.querySelectorAll(".phoneInput");
-		console.log(phoneInputFields)
-
-		// Initialize intl-tel-input on each field
-		phoneInputFields.forEach(function (phoneInputField) {
-			const iti = window.intlTelInput(phoneInputField, {
-				utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-				initialCountry: "us", // Uncomment and set initial country if needed
-			});
-
-			// Attach the intlTelInput instance to the input field
-			phoneInputField.iti = iti;  // Store the instance on the input field
-		});
-	});
-
-
 
 	function handleKeyPress(event) {
 		if (event.key === 'Enter' || event.keyCode === 13) {

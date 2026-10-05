@@ -170,3 +170,132 @@ $(document).on('submit', '#boats_search_form', function (e) {
         e.preventDefault();
     }
 });
+
+// =============================================================================
+// Boat Detail Page — all handlers below
+// Copied from mean-idaho-master/public/assets/js/custom.js
+// These only fire on pages that contain the relevant elements, so they are
+// safe to load on every page.
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Owl Carousel — .boat-detail-carosuel (desktop image carousel)
+// NOTE: The see360 inline script in boat_detail.hbs calls initCarousels() which
+// does a destroy+re-init after the gallery is un-hidden. This $(document).ready
+// block acts as the first initialisation; if the gallery is already visible
+// (see360 never ran / was removed before ready fired) it also works directly.
+// ---------------------------------------------------------------------------
+$(document).ready(function () {
+    if ($('.boat-detail-carosuel').length) {
+        $('.boat-detail-carosuel')
+            .on('initialized.owl.carousel', function () {
+                // Remove fancybox attr from cloned slides to prevent duplicate lightbox entries
+                $(this).find('.cloned [data-fancybox="gallery-detail-carousel"]').removeAttr('data-fancybox');
+            })
+            .owlCarousel({
+                loop: true,
+                margin: 10,
+                nav: true,
+                responsive: {
+                    0:    { items: 1 },
+                    600:  { items: 1 },
+                    1000: { items: 1 }
+                }
+            });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// Slick Slider — .slider-for / .slider-nav (mobile thumbnail nav)
+// ---------------------------------------------------------------------------
+$(document).ready(function () {
+    if ($('.slider-for').length && $('.slider-nav').length) {
+        $('.slider-for').slick({
+            slidesToShow:   1,
+            slidesToScroll: 1,
+            arrows:         false,
+            fade:           true,
+            asNavFor:       '.slider-nav'
+        });
+        $('.slider-nav').slick({
+            slidesToShow:   3,
+            slidesToScroll: 1,
+            asNavFor:       '.slider-for',
+            dots:           true,
+            centerMode:     true,
+            focusOnSelect:  true,
+            responsive: [
+                { breakpoint: 767, settings: { slidesToShow: 2 } },
+                { breakpoint: 450, settings: { slidesToShow: 2 } }
+            ]
+        });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// Fancybox — gallery on boat detail page
+// ---------------------------------------------------------------------------
+$(document).ready(function () {
+    if (typeof $.fancybox !== 'undefined') {
+        $.fancybox.defaults.hash = false;
+        $('[data-fancybox="boatDetailFancyBox1"]').fancybox({
+            buttons: ['zoom', 'share', 'slideShow', 'fullScreen', 'download', 'thumbs', 'close'],
+        });
+        $(window).off('popstate.fancybox');
+    }
+});
+
+// ---------------------------------------------------------------------------
+// MORE IMAGES toggle
+// ---------------------------------------------------------------------------
+$(document).on('click', '#load_more_images', function () {
+    $('.image-second-sec').toggleClass('d-none');
+    $(this).text($(this).text().trim() === 'MORE IMAGES' ? 'LESS IMAGES' : 'MORE IMAGES');
+});
+
+// ---------------------------------------------------------------------------
+// Specs / Description / Features accordion
+// ---------------------------------------------------------------------------
+$(document).ready(function () {
+    $(document).on('click', '.accordion-header.toggle-header', function () {
+        if ($(this).find('span').hasClass('fa-plus')) {
+            // Close all others first
+            $('.custom-accordion').find('.fa-minus').removeClass('fa-minus').addClass('fa-plus');
+            $('.custom-accordion').find('.specc-show').slideUp(400, function () {
+                $(this).removeClass('specc-show');
+            });
+            // Open this one
+            $(this).find('span').removeClass('fa-plus').addClass('fa-minus');
+            $(this).next('.accordion-content').slideDown(400, function () {
+                $(this).addClass('specc-show');
+            });
+        } else {
+            $(this).find('span').removeClass('fa-minus').addClass('fa-plus');
+            $(this).next('.accordion-content').slideUp(400, function () {
+                $(this).removeClass('specc-show');
+            });
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Financing Calculator Modal — open / close
+// ---------------------------------------------------------------------------
+$(document).on('click', '.opeen-calc', function () {
+    var $modal = $('.custom-modal-box');
+    $modal.css('display', 'block');
+    setTimeout(function () { $modal.addClass('show'); }, 10);
+});
+
+$(document).on('click', '.close-modal', function () {
+    var $modal = $('.custom-modal-box');
+    $modal.removeClass('show');
+    setTimeout(function () { $modal.css('display', 'none'); }, 500);
+});
+
+// ---------------------------------------------------------------------------
+// Disclaimer dropdown toggle on boat detail
+// ---------------------------------------------------------------------------
+$(document).on('click', '.disclaimer-btn', function () {
+    $(this).next('.disclaimer-content').slideToggle(200);
+});

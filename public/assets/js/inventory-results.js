@@ -100,6 +100,8 @@ function getBoats(no_boat_msg) {
                     var detail_page_url = (boatcnd === 'New') ? "/new-boats-for-sale-detail/" + boatPermalink :
                         (boatcnd === 'Used') ? "/used-pre-owned-boats-for-sale-detail/" + boatPermalink : "#";
                     var engine_hours = boat.engine_hours ? boat.engine_hours : ""
+                    var engine_make = boat.engine_make ? boat.engine_make : ""
+                    var hourse_power = boat.hourse_power ? boat.hourse_power : ""
                     var hullId = boat.hullId ? boat.hullId : ""
 
                     var priceLgoic = boat.boatPrice ? `<div class="pymentBlock"><h4> $${PaymentLogic(boat.boatPrice)}/month</h4><p>240 months, 7.99% APR <br> 20% Down Payment <br></p></div>` : "";
@@ -169,6 +171,12 @@ function getBoats(no_boat_msg) {
 
                                                     ${engine_hours? `<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
 															alt="">Hours: <span>${engine_hours} hrs</span></li>`: ''}
+
+                                                    ${engine_make? `<li><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png"
+															alt="">Engine: <span>${engine_make}</span></li>`: ''}
+
+                                                    ${hourse_power? `<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+															alt="">HP: <span>${hourse_power}</span></li>`: ''}
 
                                                     ${hullId? `<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img"
 															alt="">Serial: <span>${hullId}</span></li>`: ''}
@@ -260,6 +268,14 @@ function getBoats(no_boat_msg) {
 													${engine_hours ? `<li class="specs-list-item"><img
 														src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
 														alt=""> ${engine_hours} hrs</li>` : ''}
+
+													${engine_make ? `<li class="specs-list-item"><img
+														src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png"
+														alt=""> ${engine_make}</li>` : ''}
+
+													${hourse_power ? `<li class="specs-list-item"><img
+														src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png"
+														alt=""> ${hourse_power} HP</li>` : ''}
 
 													${hullId ? `<li class="specs-list-item"><img
 														src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img"

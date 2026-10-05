@@ -435,6 +435,8 @@ function buildLoadMoreResponse(results, currentPage) {
         var boatPermalink   = boat.boatPermalink   || '';
         var boatDescription = boat.boatDescription || '';
         var engine_hours    = boat.engine_hours    || '';
+        var engine_make     = boat.engine_make     || '';
+        var hourse_power    = boat.hourse_power    || '';
         var hullId          = boat.hullId          || '';
         var priceLgoic      = boat.boatPrice ? '<div class="pymentBlock"><h4>$' + PaymentLogic(boat.boatPrice) + '/month</h4><p>240 months, 7.99% APR<br>20% Down Payment</p></div>' : '';
         var gridpriceLgoic  = boat.boatPrice ? '<li class="grid-price-item">$' + PaymentLogic(boat.boatPrice) + '/mo*</li>' : '';
@@ -458,6 +460,8 @@ function buildLoadMoreResponse(results, currentPage) {
             + (boatLength  ? '<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-1.png" alt="">Length: <span>' + boatLength + "\'" + '</span></li>' : '')
             + (stocknmbr   ? '<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img" alt="">Stock#: <span>' + stocknmbr + '</span></li>' : '')
             + (engine_hours ? '<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png" alt="">Hours: <span>' + engine_hours + ' hrs</span></li>' : '')
+            + (engine_make ? '<li><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png" alt="">Engine: <span>' + engine_make + '</span></li>' : '')
+            + (hourse_power ? '<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png" alt="">HP: <span>' + hourse_power + '</span></li>' : '')
             + (hullId ? '<li><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img" alt="">Serial: <span>' + hullId + '</span></li>' : '')
             + '</ul></div></div>'
             + '<div class="sm-box-2"><div class="pricing-box"><div class="price-per-month">'
@@ -477,6 +481,8 @@ function buildLoadMoreResponse(results, currentPage) {
             + (boatcnd    ? '<li class="specs-list-item"><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/condition.png" alt=""> ' + boatcnd + '</li>' : '')
             + (boatLength ? '<li class="specs-list-item"><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-1.png" alt=""> ' + boatLength + "\'" + '</li>' : '')
             + (engine_hours ? '<li class="specs-list-item"><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png" alt=""> ' + engine_hours + ' hrs</li>' : '')
+            + (engine_make ? '<li class="specs-list-item"><img src="https://cdn.mdsbrand.com/madis/assets/images/boat-details-icon/engines.png" alt=""> ' + engine_make + '</li>' : '')
+            + (hourse_power ? '<li class="specs-list-item"><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/specs-list-img-3.png" alt=""> ' + hourse_power + ' HP</li>' : '')
             + (hullId ? '<li class="specs-list-item"><img src="https://cdn.mdsbrand.com/madis/assets/images/listing images/listing-icon-4.png" class="stock-img" alt="">' + hullId + '</li>' : '')
             + '</ul></div></div></div></div>'
             + '</div>';
