@@ -1,0 +1,156 @@
+<style>
+  .section_wrapper {
+    display: block;
+  }
+
+  .square-card-image {
+    position: relative;
+    padding-top: 55%;
+  }
+
+  .square-card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .red-btn {
+    text-decoration: none;
+  }
+</style>
+
+
+<section class="custom-padding-top">
+  <div class="text-center my-5">
+    <h1 class="lg-heading">Events at Idaho Water Sports</h1>
+  </div>
+</section>
+<section class="staf-sec">
+
+  <div class="container-fluid">
+    <div class="row m-0">
+      <div class="col-xl-9 m-auto">
+        {{!-- <div class="row my-md-4">
+          {{#each eventData as |event|}}
+          <div class="col-md-6 my-3">
+            <div class="card no-border">
+              <div class="square-card-image">
+                {{#if event.thumbImg}}
+                <a href="/event-detail/{{this.eventSlug}}">
+                  <img src="{{event.thumbImg}}" alt="{{imgAlt 'events-page-new-event' 'Event'}}" data-alt-key="events-page-new-event">
+                </a>
+
+                {{else}}
+                {{#if event.hroImage}}
+                <a href="/event-detail/{{this.eventSlug}}">
+                  <img src="{{event.hroImage}}" alt="{{imgAlt 'events-page-new-event-2' 'Event'}}" data-alt-key="events-page-new-event-2">
+                </a>
+                {{else}}
+                <a href="/event-detail/{{this.eventSlug}}">
+                  <img src="https://cdn.mdsbrand.com/mean-idaho-staging/assets/images/comming-img-holder.jpg" alt="{{imgAlt 'events-page-new-comming-img-holder' 'Comming Img Holder'}}" data-alt-key="events-page-new-comming-img-holder">
+                </a>
+                {{/if}}
+                {{/if}}
+              </div>
+              <div class="card-body custom-body">
+                <h6 class="theme-color">{{{getDateRange event.events}}}</h6>
+                <h4 class="events-title"><a href="/event-detail/{{this.eventSlug}}"
+                    style="color: inherit;text-decoration:none;">{{ event.eventTitle}}</a></h4>
+                <div class="short-event-description">
+                  {{{ event.eventDesc}}}
+                </div>
+              </div>
+              <div class="text-center py-4">
+                <a href="/event-detail/{{this.eventSlug}}" class="red-btn">EVENT INFORMATION</a>
+              </div>
+            </div>
+
+          </div>
+          {{/each}}
+
+        </div> --}}
+
+        <div class="row my-md-4">
+          {{#each eventData as |event|}}
+          <div class="col-md-6 my-3">
+            <div class="card no-border">
+              <div class="square-card-image">
+                {{#if event.thumbImg}}
+                {{#ifCond event.eventTitle "==" "2025 Wake In The Snake"}}
+                <a href="https://www.eventbrite.com/e/wake-in-the-snake-tickets-1334213411229?aff=oddtdtcreator"
+                  target="_blank">
+                  <img src="{{resizeUrl event.thumbImg 'w=1200&format=webp'}}" alt="{{imgAlt 'events-page-new-event-3' 'Event'}}" data-alt-key="events-page-new-event-3">
+                </a>
+                {{else}}
+                <a href="/event-detail/{{event.eventSlug}}">
+                  <img src="{{resizeUrl event.thumbImg 'w=1200&format=webp'}}" alt="{{imgAlt 'events-page-new-event-4' 'Event'}}" data-alt-key="events-page-new-event-4">
+                </a>
+                {{/ifCond}}
+                {{else}}
+                {{#if event.hroImage}}
+                {{#ifCond event.eventTitle "==" "2025 Wake In The Snake"}}
+                <a href="https://www.eventbrite.com/e/wake-in-the-snake-tickets-1334213411229?aff=oddtdtcreator"
+                  target="_blank">
+                  <img src="{{resizeUrl event.hroImage 'w=1200&format=webp'}}" alt="{{imgAlt 'events-page-new-event-5' 'Event'}}" data-alt-key="events-page-new-event-5">
+                </a>
+                {{else}}
+                <a href="/event-detail/{{event.eventSlug}}">
+                  <img src="{{resizeUrl event.hroImage 'w=1200&format=webp'}}" alt="{{imgAlt 'events-page-new-event-6' 'Event'}}" data-alt-key="events-page-new-event-6">
+                </a>
+                {{/ifCond}}
+                {{else}}
+                {{#ifCond event.eventTitle "==" "2025 Wake In The Snake"}}
+                <a href="https://www.eventbrite.com/e/wake-in-the-snake-tickets-1334213411229?aff=oddtdtcreator"
+                  target="_blank">
+                  <img src="https://cdn.mdsbrand.com/resize/mean-idaho-staging/assets/images/comming-img-holder.jpg?w=1200&format=webp" alt="{{imgAlt 'events-page-new-comming-img-holder-2' 'Comming Img Holder'}}" data-alt-key="events-page-new-comming-img-holder-2">
+                </a>
+                {{else}}
+                <a href="/event-detail/{{event.eventSlug}}">
+                  <img src="https://cdn.mdsbrand.com/resize/mean-idaho-staging/assets/images/comming-img-holder.jpg?w=1200&format=webp" alt="{{imgAlt 'events-page-new-comming-img-holder-3' 'Comming Img Holder'}}" data-alt-key="events-page-new-comming-img-holder-3">
+                </a>
+                {{/ifCond}}
+                {{/if}}
+                {{/if}}
+              </div>
+
+              <div class="card-body custom-body">
+                <h6 class="theme-color">{{{getDateRange event.events}}}</h6>
+                <h4 class="events-title">
+                  {{#ifCond event.eventTitle "==" "2025 Wake In The Snake"}}
+                  <a href="https://www.eventbrite.com/e/wake-in-the-snake-tickets-1334213411229?aff=oddtdtcreator"
+                    target="_blank" style="color: inherit; text-decoration: none;">
+                    {{event.eventTitle}}
+                  </a>
+                  {{else}}
+                  <a href="/event-detail/{{event.eventSlug}}" style="color: inherit; text-decoration: none;">
+                    {{event.eventTitle}}
+                  </a>
+                  {{/ifCond}}
+                </h4>
+                {{!-- <div class="short-event-description">
+                  {{{event.eventDesc}}}
+                </div> --}}
+              </div>
+
+              <div class="text-center py-4">
+                {{#ifCond event.eventTitle "==" "2025 Wake In The Snake"}}
+                <a href="https://www.eventbrite.com/e/wake-in-the-snake-tickets-1334213411229?aff=oddtdtcreator"
+                  target="_blank" class="red-btn">EVENT INFORMATION</a>
+                {{else}}
+                <a href="/event-detail/{{event.eventSlug}}" class="red-btn">EVENT INFORMATION</a>
+                {{/ifCond}}
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+</section>

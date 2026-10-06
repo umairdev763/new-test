@@ -195,6 +195,18 @@ router.post(
       const obj = JSON.parse(JSON.stringify(req.body));
       const dateLength = Number(req.body.event_date_length) || 0;
 
+      // Auto-generate slug from title if not provided
+      if (!obj.eventSlug && obj.eventTitle) {
+        obj.eventSlug = obj.eventTitle
+          .toString()
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+
       // event_delete_date parsing (if present)
       let event_delete_date = obj.event_end_date;
       let newdleteDate = null;

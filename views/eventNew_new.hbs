@@ -806,7 +806,7 @@ div#cstForlaHeight .fr-box {
                                             <div class="mb-3 col-sm-3">
                                                 <label for="" class="form-label">Event Date</label>
                                                 {{!-- <input type="date" class="form-control" id="event_start_date[0]" placeholder="" name="event_start_date[]" required value=""> --}}
-                                                 <input type="text" id="inline-datepicker" name="event_start_date[]" class="form-control flatpickr-input" placeholder="Inline calendar" readonly="readonly">
+                                                 <input type="text" name="event_start_date[]" class="form-control flatpickr-input" placeholder="YYYY-MM-DD" readonly="readonly">
                                             </div>
                                             <div class="mb-3 col-sm-3">
                                                 <label for="" class="form-label">Event Start Time</label>
@@ -1104,29 +1104,102 @@ div#cstForlaHeight .fr-box {
 </script>
 
 <script>
-    // Initialize flatpickr for event dates (matching reference implementation)
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof flatpickr !== 'undefined') {
-            flatpickr("#inline-datepicker", {
-                dateFormat: "Y-m-d",
-                allowInput: true,
-                inline: true
-            });
+    // ── Slug auto-generation ──────────────────────────────────────────────────
+    (function() {
+        var titleInput = document.getElementById('eventTitle');
+        var slugInput  = document.getElementById('eventSlug');
+        if (!titleInput || !slugInput) return;
 
-            // Initialize time pickers for start and end times
-            flatpickr("#event_star_time\\[0\\]", {
-                enableTime: true,
-                noCalendar: true,
-                dateFormat: "H:i",
-                time_24hr: false
-            });
-
-            flatpickr("#event_end_time\\[0\\]", {
-                enableTime: true,
-                noCalendar: true,
-                dateFormat: "H:i",
-                time_24hr: false
-            });
+        function toSlug(str) {
+            return str.toString().toLowerCase().trim()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
         }
+        titleInput.addEventListener('input', function() {
+            slugInput.value = toSlug(titleInput.value);
+        });
+        titleInput.addEventListener('blur', function() {
+            var metaTitle = document.getElementById('metaTitle');
+            if (metaTitle && !metaTitle.value) metaTitle.value = titleInput.value;
+        });
+    })();
+
+    // ── Flatpickr init helper — call on every date/time input ─────────────────
+    function initDateInputs(container) {
+        container = container || document;
+        container.querySelectorAll('input[name="event_start_date[]"]').forEach(function(el) {
+            if (el._flatpickr) return;
+            flatpickr(el, { dateFormat: 'Y-m-d', allowInput: true });
+        });
+        container.querySelectorAll('input[name="event_star_time[]"]').forEach(function(el) {
+            if (el._flatpickr) return;
+            flatpickr(el, { enableTime: true, noCalendar: true, dateFormat: 'h:i K', time_24hr: false, allowInput: true });
+        });
+        container.querySelectorAll('input[name="event_end_time[]"]').forEach(function(el) {
+            if (el._flatpickr) return;
+            flatpickr(el, { enableTime: true, noCalendar: true, dateFormat: 'h:i K', time_24hr: false, allowInput: true });
+        });
+    }
+
+    // ── Add Date row ──────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        initDateInputs();
+
+        var addDateBtn = document.getElementById('addDate');
+        var dateWraper = document.querySelector('.dateWraper');
+        if (!addDateBtn || !dateWraper) return;
+
+        addDateBtn.addEventListener('click', function() {
+            var count = parseInt(addDateBtn.getAttribute('data-count') || '1', 10);
+            count++;
+            addDateBtn.setAttribute('data-count', count);
+            document.getElementById('event_date_length').value = count;
+
+            var row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML = [
+                '<div class="mb-3 col-sm-3">',
+                  '<label class="form-label">Event Date</label>',
+                  '<input type="text" name="event_start_date[]" class="form-control flatpickr-input" placeholder="YYYY-MM-DD">',
+                '</div>',
+                '<div class="mb-3 col-sm-3">',
+                  '<label class="form-label">Event Start Time</label>',
+                  '<input type="text" name="event_star_time[]" class="form-control" placeholder="e.g. 9:00 AM">',
+                '</div>',
+                '<div class="mb-3 col-sm-3">',
+                  '<label class="form-label">Event End Time</label>',
+                  '<input type="text" name="event_end_time[]" class="form-control" placeholder="e.g. 5:00 PM">',
+                '</div>',
+                '<div class="mb-3 col-sm-3 text-right">',
+                  '<label class="form-label">Delete Date</label>',
+                  '<div><button type="button" class="btn btn-sm btn-danger deleteDate">Delete</button></div>',
+                '</div>'
+            ].join('');
+
+            dateWraper.appendChild(row);
+            initDateInputs(row);
+
+            row.querySelector('.deleteDate').addEventListener('click', function() {
+                row.remove();
+                var c = parseInt(addDateBtn.getAttribute('data-count'), 10) - 1;
+                addDateBtn.setAttribute('data-count', c);
+                document.getElementById('event_date_length').value = c;
+            });
+        });
+
+        // Delete listener for the initial row's delete button
+        document.querySelectorAll('.deleteDate').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var row = btn.closest('.row');
+                if (row) {
+                    row.remove();
+                    var c = parseInt(addDateBtn.getAttribute('data-count'), 10) - 1;
+                    addDateBtn.setAttribute('data-count', c < 1 ? 1 : c);
+                    document.getElementById('event_date_length').value = c < 1 ? 1 : c;
+                }
+            });
+        });
     });
 </script>

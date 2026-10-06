@@ -1,0 +1,393 @@
+<style>
+    .section_wrapper {
+        display: block;
+    }
+
+    .bnrHding {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        color: #fff;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .event-details-header img {
+        filter: brightness(0.7);
+    }
+
+    /* event detail page css */
+
+    .event-details-header {
+        position: relative;
+        padding-top: 47%;
+    }
+
+    .event-details-header img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .event-box {
+        background-color: #f3fbfd;
+        padding: 45px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        flex-direction: column;
+    }
+
+    .event-box p {
+        margin-bottom: 5px;
+        margin-top: 5px;
+        font-family: 'Lato-Black';
+        letter-spacing: 0.5px;
+        font-size: 22px;
+    }
+
+    .event-box h6 {
+        font-weight: 600;
+    }
+
+    .footer-top-sec {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .top_heading {
+        background-color: #e2e2e2;
+        max-width: 400px;
+        padding: 10px 0;
+        margin: 0 auto;
+    }
+
+    .dateList {
+        list-style: none;
+        max-width: 320px;
+        margin: auto;
+        padding: 20px 8px 0;
+    }
+
+    .top_heading>h3 {
+        font-size: 20px;
+        margin-bottom: 0;
+    }
+
+    .venue-desc p a {
+        font-size: 16px;
+        color: #000 !important;
+        text-decoration: none !important;
+    }
+
+    .venueWrap {
+        padding: 30px 0;
+        max-width: 800px;
+        margin: auto;
+        text-align: center;
+    }
+
+    .red-btn {
+        text-decoration: none;
+    }
+
+    @media screen and (max-width: 576px) {
+        .event-details-header {
+            padding-top: 73%;
+        }
+        .venueWrap{
+            padding: 15px 0px;
+        }
+    }
+</style>
+<section class="custom-padding-top">
+    <div class="event-details-header">
+        <img src="{{#if eventData.hroImage}}{{resizeUrl eventData.hroImage 'w=2600&format=webp'}}{{else}}https://cdn.mdsbrand.com/resize/madis/assets/images/default_boat_image.png?w=2600&format=webp{{/if}}"
+            class="banner-img" alt="{{imgAlt 'event-detail-if' 'If'}}" data-alt-key="event-detail-if">
+        <h1 class="mb-3 mb-md-5 lg-heading bnrHding">{{eventData.eventTitle}}</h1>
+    </div>
+</section>
+
+<div class="container-fluid">
+    <div class="row mx-0">
+        <div class="col-md-9 col-lg-6 m-auto">
+            <div class="my-3 my-md-5 text-center central-text">
+
+                <p>{{{eventData.eventDesc}}}</p>
+                <div class="my-5">
+                    {{#ifCond eventData.eventSlug '==' 'pursuit-summer-sale'}}
+                    <a href="/boats-for-sale?brand=Pursuit" class="blue-non-fill-btn">SHOP THIS BRAND</a>
+                    {{/ifCond}}
+                    {{#ifCond eventData.eventSlug '==' 'path-finder'}}
+                    <a href="/boats-for-sale?brand=Pathfinder" class="blue-non-fill-btn">SHOP THIS BRAND</a>
+                    {{/ifCond}}
+                    {{#ifCond eventData.eventSlug '==' 'cobia-clear-the-deck'}}
+                    <a href="/boats-for-sale?brand=Cobia" class="blue-non-fill-btn">SHOP THIS BRAND</a>
+                    {{/ifCond}}
+                    {{#ifCond eventData.eventSlug '==' 'cobalt'}}
+                    <a href="/boats-for-sale?brand=Cobalt" class="blue-non-fill-btn">SHOP THIS BRAND</a>
+                    {{/ifCond}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row mx-0">
+        <div class="col-md-10 col-lg-10 m-auto">
+            {{!-- <div class="row mb-3 mb-md-5">
+                <div class="col-sm-4 mb-3">
+                    <div class="event-box">
+                        <h6>WHEN</h6>
+                        {{#each eventData.events}}
+                        <p class="event-date">{{this.eventDate}}</p>
+                        <p class="event-time">{{this.eventTimeStart}} – {{this.eventTimeEnd}}</p>
+                        {{/each}}
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4 mb-3">
+                    <div class="event-box">
+                        <h6>WHERE</h6>
+                        <p class="event-date">{{#if eventData.locname}}{{eventData.locname}}{{else}}{{/if}}</p>
+                        <p class="event-time">{{#if eventData.city}}{{eventData.city}}{{else}}{{/if}}
+                            {{#if eventData.street}}{{eventData.street}}{{else}}{{/if}}
+                            {{#if eventData.state}}{{eventData.state}}{{else}}{{/if}}
+                            {{#if eventData.zipcode}}{{eventData.zipcode}}{{else}}{{/if}}</p>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4 mb-3">
+                    <div class="event-box">
+                        <h6>ADMISSION</h6>
+
+                    </div>
+
+                </div>
+            </div> --}}
+            <div class="row">
+                {{#if eventData.locname}}
+                <div class="col-lg-6 mx-auto">
+                    <div class="venueWrap">
+                        {{!-- <div class="venueHead">
+                            <h2>October 26 – 30 <br> at Bahia Mar Yachting Center</h2>
+                        </div> --}}
+                        <div class="venue-desc">
+                            <div class="top_heading">
+                                <h3>Location</h3>
+                            </div>
+                            <p>
+                                <strong>{{#if eventData.locname}}{{eventData.locname}}{{else}}{{/if}}</strong> <br>
+                                {{#if eventData.street}}{{eventData.street}}{{else}}{{/if}}
+                                {{#if eventData.city}}{{eventData.city}}{{else}}{{/if}},
+                                {{#if eventData.state}}{{eventData.state}}{{else}}{{/if}}
+                                {{#if eventData.zipcode}}{{eventData.zipcode}}{{else}}{{/if}}
+
+
+                            </p>
+                            {{#if eventData.phone}}
+                            {{#ifCond eventData.phone '!=' ''}}<p><strong>Phone</strong>:<a
+                                    href="tel:{{eventData.phone}}"
+                                    class="contact_num text-decoration-none">{{eventData.phone}}</a></p>
+                            {{else}}{{/ifCond}}
+                            {{else}}
+
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                {{else}}
+                {{/if}}
+                <div class="col-lg-6 mx-auto">
+                    <div class="venueWrap">
+                        {{!-- <div class="venueHead">
+                            <h2>October 26 – 30 <br> at Bahia Mar Yachting Center</h2>
+                        </div> --}}
+                        <div class="venue-desc">
+                            <div class="top_heading">
+                                {{#if eventData.promotion}}
+                                {{#ifCond eventData.promotion "==" "Yes"}}
+                                <h3>Event Dates & Times</h3>
+                                {{else}}
+                                <h3>SHOW DATES & TIME</h3>
+                                {{/ifCond}}
+                                {{else}}
+                                <h3>SHOW DATES & TIME</h3>
+                                {{/if}}
+                            </div>
+                            <p>
+                                {{!-- {{#if eventData.events}} --}}
+                            <ul class="dateList">
+                                {{#each eventData.events}}
+                                <li class="singlDate">
+                                    <span> {{formatToMonthDayYear this.eventDate}} </span><span>{{this.eventTimeStart}}
+                                        – {{this.eventTimeEnd}}</span>
+                                </li>
+                                {{/each}}
+                            </ul>
+                            {{!-- {{/if}} --}}
+                            {{#if eventData.show_calendar}}
+
+                            {{{eventData.show_calendar}}}
+
+
+                            {{/if}}
+
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-5">
+                <a href="https://www.eventbrite.com/e/wake-in-the-snake-tickets-1368814173039" target="_blank" class="red-btn">REGISTER FOR THIS EVENT</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{{!-- <section class="brand-logo-sec">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-11 m-auto">
+
+                <div class="my-3 my-md-5">
+                    <h3 class="text-center title-heading">BRANDS ON DISPLAY</h3>
+                </div>
+                <div class="owl-carousel owl-theme logo-carousel">
+                    <div class="item p-4">
+                        <a href="/brand/Cobalt"><img src="/assets/images/mega-menu-logo-1.png" alt="{{imgAlt 'event-detail-mega-menu-logo-1' 'Mega Menu Logo 1'}}" data-alt-key="event-detail-mega-menu-logo-1"></a>
+                    </div>
+
+                    <div class="item p-4">
+                        <a href="/brand/Cobia"> <img src="/assets/images/mega-menu-logo-2.png" alt="{{imgAlt 'event-detail-mega-menu-logo-2' 'Mega Menu Logo 2'}}" data-alt-key="event-detail-mega-menu-logo-2"></a>
+                    </div>
+
+                    <div class="item p-4">
+                        <a href="/brand/PathFinder"> <img src="/assets/images/mega-menu-logo-3.png" alt="{{imgAlt 'event-detail-mega-menu-logo-3' 'Mega Menu Logo 3'}}" data-alt-key="event-detail-mega-menu-logo-3"></a>
+                    </div>
+
+                    <div class="item p-4">
+                        <a href="/brand/Pursuit"> <img src="/assets/images/mega-menu-logo-4.png" alt="{{imgAlt 'event-detail-mega-menu-logo-4' 'Mega Menu Logo 4'}}" data-alt-key="event-detail-mega-menu-logo-4"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section> --}}
+{{!-- <hr class="my-5"> --}}
+
+{{!-- <div class="my-3 my-md-5">
+    <h3 class="text-center title-heading">INVENTORY PRESENT AT THIS EVENT</h3>
+</div> --}}
+{{#ifCond boatDate.length '>' 0}}
+<div class="container-fluid">
+    <div class="row mx-0">
+        <div class="col-lg-11 m-auto">
+            <div class="row my-4">
+                {{#each boatDate}}
+                <div class="col-md-4">
+                    <div class="card no-border">
+                        <div class="card-image">
+                            <a
+                                href="/{{#ifCond this.boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-pre-owned-boats-for-sale-detail{{/ifCond}}/{{this.boatPermalink}}">
+                                <img src="{{this.productImage}}" class="card-img-top" alt="{{imgAlt 'event-detail-img' '...'}}" data-alt-key="event-detail-img"
+                                    style="height: 265px; object-fit:cover;">
+                            </a>
+                        </div>
+                        <div class="card-body custom-body text-center">
+                            <a href="/{{#ifCond this.boat_condition '==' 'New'}}new-boats-for-sale-detail{{else}}used-pre-owned-boats-for-sale-detail{{/ifCond}}/{{this.boatPermalink}}"
+                                style="color: inherit;text-decoration:none;">
+                                <h5 class="card-title full-bold">{{this.boatTitle}}</h5>
+                            </a>
+                            <p class="card-text theme-color">{{#if this.retail_price}} ${{thousandSeprator
+                                this.retail_price}} {{else}} Call For Pricing{{/if}}</p>
+                            <div class="card-end-conditions">
+                                <span class="border-right">{{#if
+                                    this.boat_condition}}{{this.boat_condition}}{{else}}{{/if}}</span>
+                                <span class="border-right">{{#if
+                                    this.boat_length}}{{this.boat_length}}ft{{else}}{{/if}}</span>
+                                <span>{{#if this.boat_sale_status}}{{this.boat_sale_status}}{{else}}{{/if}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>
+{{/ifCond}}
+
+<div class="text-center my-4 my-md-5" id="event-registration-form">
+    <h3 class="lg-heading">REGISTRATION</h3>
+</div>
+
+
+{{!-- <div class="contaienr-fluid" id="event_detail_form">
+    <div class="row mx-0">
+        <div class="col-lg-6 m-auto">
+            <div class="row">
+                <div class="col-lg-6">
+                    <label id="first_nameLabel" for="first_name" class="sr-only">First Name*</label>
+                    <div class="field-error" id="error_first_name"></div>
+                    <input type="text" id="first_name" class="form-control custom-form-control require_check mb-4" placeholder="First Name" >
+                </div>
+                <div class="col-lg-6">
+                    <label id="last_nameLabel" for="last_name" class="sr-only">Last Name*</label>
+                                        <div class="field-error" id="error_last_name"></div>
+                    <input type="text" id="last_name" class="form-control custom-form-control require_check mb-4" placeholder="Last Name" >
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <label id="emailLabel" for="email" class="sr-only">Email*</label>
+                                        <div class="field-error" id="error_email"></div>
+                    <input type="email" id="email" class="form-control custom-form-control require_check mb-4" placeholder="Email" >
+                </div>
+                <div class="col-lg-6">
+                    <label id="phoneLabel" for="phone" class="sr-only">Phone*</label>
+                                        <div class="field-error" id="error_phone"></div>
+                    <input  type="tel" id="phone" class="form-control custom-form-control phoneInput require_check mb-4"  >
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <input type="text" id="make" class="form-control custom-form-control require_check mb-4" placeholder="Make of Interest" >
+                </div>
+                <div class="col-lg-6">
+                    <input type="text" id="model" class="form-control custom-form-control require_check mb-4" placeholder="Model of Interest" >
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <input type="text" name="honeypot" id="honeypot" style="display: none;">
+                    <input type="hidden" id="event_url" value="{{baseUrl}}/event-detail/{{eventData.eventSlug}}">
+                    <textarea name="" id="comments" cols="30" rows="10" class="form-control textarea-form-control"
+                        placeholder="Message"></textarea>
+                </div>
+            </div>
+            <div class="my-5 text-center pb-md-5">
+                <button type="button" class="red-btn g-recaptcha" data-sitekey="{{config.googleCaptchaSiteKey}}"
+                    data-callback="event_detail_form" data-action="submit">SUBMIT</button>
+            </div>
+        </div>
+    </div>
+</div> --}}

@@ -7,6 +7,8 @@ const MongoStore   = require('connect-mongodb-session')(session);
 const exphbs       = require('express-handlebars');
 const { connectDB, getDB } = require('./config/db');
 const inventoryUrl = require('./lib/inventory-url');
+const common       = require('./lib/common');
+const moment       = require('moment-timezone');
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.config = {
     siteName:        'Boats App',
     productsPerPage: 12,
     baseUrl:         process.env.BASE_URL || 'http://localhost:3000',
+    themeViews:      'themes/material/',
+    company_name:    'Idaho Water Sports',
 };
 
 // ---------------------------------------------------------------------------
@@ -352,8 +356,31 @@ const hbs = exphbs.create({
                 return "";
             }
         },
+
+        // {{getDateRange events}} — format event date range
+        // Copied from reference project
+        getDateRange: function(events) {
+            if (!events || !Array.isArray(events) || events.length === 0) {
+                return '';
+            }
+            const firstEvent = events[0];
+            if (firstEvent.eventDate) {
+                return moment(firstEvent.eventDate).format('MMMM D, YYYY');
+            }
+            return '';
+        },
+
+        // {{formatToMonthDayYear date}} — format date to Month Day, Year
+        // Copied from reference project
+        formatToMonthDayYear: function(date) {
+            if (!date) return '';
+            return moment(date).format('MMMM D, YYYY');
+        },
     },
 });
+
+
+
 
 app.engine('.hbs', hbs.engine);
 app.set('view engine', '.hbs');
@@ -423,6 +450,221 @@ app.use('/admin', adminRouter);
 app.use('/', inventoryFilterRouter);  // ← SEO filter routes (BEFORE index)
 app.use('/', indexRouter);            // ← base listing + feed routes
 app.use('/boats', boatsRouter);       // ← boats detail/api routes
+
+
+    
+app.get('/events-idahotwatersports', (req, res, next) => {
+    req.params.page = null;
+    eventListHandler(req, res, next);
+});
+
+app.get('/events-idahotwatersports/:page', (req, res, next) => {
+    eventListHandler(req, res, next);
+});
+
+function eventListHandler(req, res, next) {
+    let db = req.app.db;
+    let config = req.app.config;
+    let pageSlug = req.params.page;
+    let current_page = (req.query.current_page) ? req.query.current_page : 1; 
+    let currentdate = moment().tz("America/Los_Angeles").format() 
+    currentdate = currentdate.split('-')
+    const formattedDate = `${currentdate[0]}-${currentdate[1]}-${currentdate[2]}.059Z`;   
+    let todayDate = new Date(formattedDate)
+ 
+    console.log(todayDate, "todayDate")
+    Promise.all([ 
+        common.selectMenu(db, 'header_menu'), 
+        common.selectMenu(db, 'header_menu'), 
+        common.selectMenu(db, 'footer_menu'),  
+        common.getInventoryMenu(db)
+    ])
+        .then(async ([menu, modelMenu, footerMenu, inventoryMenu]) => { 
+           // var eventData = await db.events_new.find({}).sort({ "sortByStrtDate": 1 }).toArray();
+           let numberProducts = 12;
+
+           let skip = 0;
+            if (current_page > 1) {
+                skip = (current_page - 1) * numberProducts;
+            }
+            var eventData = await db.events_new.find({ "Status": "Publish" }).sort({ "sortByStrtDate": 1 }).skip(skip).limit(parseInt(numberProducts)).toArray();
+            var eventDataNew = await db.events_new.countDocuments({ "Status": "Publish" });
+            // console.log("event date nwe", eventDataNew)
+            var noOfPages = Math.ceil(eventDataNew / parseInt(numberProducts));
+            // console.log(noOfPages);
+            // console.log(current_page);
+            var scripts = common.getDockingPageScripts();
+            scripts.push({
+                script: '/assets/js/fancybox/3.0.47/jquery.fancybox.min.js',
+                comment: ''
+            })
+
+            var styles = common.getMainPageStyles();
+            // styles.push({ url: '/assets/css/madis-common-pages-style.css', comment: '' })
+
+            var title, metaDescription, metaTags;
+            let pgePath = req.path ? req.path : ""
+
+            if (req.query.load_more == 1) { 
+                var result_html = ''; 
+                var result_count = eventData; 
+                function formatDate(date, format) {  
+                    return moment(date).format(format);  
+                }
+                for (var i = 0; i < result_count.length; i++) {
+                    let img = result_count[i].image ? `<img src="${result_count[i].image}" class="" alt="">` : `<img src="https://cdn.mdsbrand.com/madis/assets/images/no_image_available.jpg" alt="">`
+                    let blog_date = formatDate(result_count[i].newsAddedDate, "MM/DD/YYYY hh:mmA")
+                    let hroImage = result_count[i].hroImage || '';
+                    result_html += `
+                   <div class="event-listing-col">
+                    <div class="event-listing-image">
+                         ${result_count[i].thumbImg ?
+                            `<a href="/event-detail/${result_count[i].eventSlug}">
+                                            <img src="${result_count[i].thumbImg}" alt="">
+                                        </a>` :
+                            hroImage ?
+                                `<a href="/event-detail/${result_count[i].eventSlug}">
+                                                <img src="${result_count[i].hroImage}" alt="">
+                                            </a>` :
+                                `<a href="/event-detail/${result_count[i].eventSlug}">
+                                                <img src="https://cdn.mdsbrand.com/madis/assets/images/coming-soon.webp" alt="">
+                                            </a>`
+                        }
+                    </div>
+
+                    <div class="event-content-box">
+                      <a href="/event-detail/${result_count[i].eventSlug}"><h6 class="event-title">${result_count[i].eventTitle}</h6></a>
+                        <h6 class="event-date">${blog_date}</h6>
+                    </div>
+                </div>
+                `;
+
+                }
+                res.json({
+                    'current_page': current_page,
+                    'pageCount': noOfPages, 
+                    'result': result_html 
+                });
+                return; 
+            }
+          
+            res.render(`${config.themeViews}events_page_new`, {
+                modelMenu,
+                pgePath,
+                pageCount: noOfPages,
+                inventoryMenu,
+                eventData: eventData,
+                current_page,
+                config: config,
+                site_url: req.protocol + '://' + req.get('host') + req.originalUrl,
+                session: req.session,
+                menu: menu,
+                footerMenu: footerMenu,
+                message: common.clearSessionValue(req.session, 'message'),
+                messageType: common.clearSessionValue(req.session, 'messageType'),
+                helpers: hbs.helpers,
+                showFooter: 'showFooter',
+                scripts: scripts,
+                styles: styles,
+                publicMeta: config.publicMeta
+            });
+        })
+        .catch(err => {
+            console.error('Error in event list:', err);
+            next(err);
+        });
+}
+
+
+
+app.get('/event-detail/:page', async (req, res) => {
+    let db = req.app.db;
+    let config = req.app.config;
+    let pageSlug = req.params.page;
+
+    console.log("Event Detail - Looking for slug:", pageSlug);
+
+    const setting = await db.template_settings.findOne({ page: "event-detail" });
+    const currentTemplate = setting?.value || "event-detail";
+    console.log("Event Detail current Template is :",currentTemplate)
+
+    Promise.all([
+        common.selectMenu(db, 'header_menu'),
+        common.selectMenu(db, 'header_menu'),
+        common.selectMenu(db, 'footer_menu')
+    ])
+        .then(async ([menu, modelMenu, footerMenu]) => {
+            var eventData = await db.events_new.find({ "eventSlug": pageSlug }).toArray();
+            console.log("Event Detail - Found events:", eventData.length);
+            if (eventData[0]) {
+                let newInvntry = [];
+                if (eventData[0].inventory) {
+                    eventData[0].inventory.forEach(function (arrayItem) {
+                        newInvntry.push(arrayItem.calleriq_boat_id);
+                    });
+                }
+                let inventoryShow = eventData[0].inventory ? eventData[0].inventory : [];
+                const query = { calleriq_boat_id: { $in: newInvntry } };
+                const sortOrder = newInvntry.map((id, index) => ({ $cond: [{ $eq: ['$calleriq_boat_id', id] }, index, 999999] }));
+                let boatDate = await db.boats.aggregate([
+                    { $match: query },
+                    { $addFields: { order: { $arrayElemAt: [sortOrder, { $indexOfArray: [newInvntry, '$calleriq_boat_id'] }] } } },
+                    { $sort: { order: 1 } }
+                ]).toArray()
+
+                var scripts = common.getDockingPageScripts();
+                scripts.push({
+                    comment: ''
+                })
+
+                var styles = common.getMainPageStyles();
+                // styles.push({ url: '/assets/css/madis-common-pages-style.css', comment: '' })
+
+                // res.render(`${config.themeViews}event-detail`, {
+                res.render(`${config.themeViews}${currentTemplate}`, {
+                    titleboat: eventData[0]?.metaTitle || `Events | ${config.company_name}`,
+                    metaDescription: eventData[0]?.metaDesc || `Event details at ${config.company_name}.`,
+                    modelMenu,
+                    metaImg: eventData[0].thumbImg,
+                    eventData: eventData[0],
+                    boatDate,
+                    page: "EVENT",
+                    config: config,
+                    site_url: req.protocol + '://' + req.get('host') + req.originalUrl,
+                    session: req.session,
+                    menu: menu,
+                    footerMenu: footerMenu,
+                    message: common.clearSessionValue(req.session, 'message'),
+                    messageType: common.clearSessionValue(req.session, 'messageType'),
+                    helpers: hbs.helpers,
+                    showFooter: 'showFooter',
+                    scripts: scripts,
+                    styles: styles,
+                    publicMeta: config.publicMeta
+                });
+            }
+            else {
+                res.render('error', {
+                    title: 'Not found',
+                    message: 'Boat not found',
+                    helpers: hbs.helpers,
+                    config,
+                    scripts: scripts,
+                    styles: common.getMainPageStyles(),
+                    showFooter: true,
+                    menu: common.getMenu(db),
+                    footerMenu: common.selectMenu(db, 'footer_menu'),
+                    publicMeta: config.publicMeta
+                });
+            }
+        })
+});
+
+    // Handle /event-detail/ without a slug
+    app.get('/event-detail/', (req, res) => {
+        res.redirect('/events-idahotwatersports');
+    });
+
 
 // ---------------------------------------------------------------------------
 // Connect & start
