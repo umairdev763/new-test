@@ -246,11 +246,27 @@ $(document).ready(function () {
 // ---------------------------------------------------------------------------
 // MORE IMAGES toggle
 // ---------------------------------------------------------------------------
-$(document).on('click', '#load_more_images', function () {
-    $('.image-second-sec').toggleClass('d-none');
-    $(this).text($(this).text().trim() === 'MORE IMAGES' ? 'LESS IMAGES' : 'MORE IMAGES');
-});
+// $(document).on('click', '#load_more_images', function () {
+//     $('.image-second-sec').toggleClass('d-none');
+//     $(this).text($(this).text().trim() === 'MORE IMAGES' ? 'LESS IMAGES' : 'MORE IMAGES');
+// });
+$(document).on('click', '#load_more_images', function (event) {
+    $('.image-second-sec').toggleClass('d-none')
+    const newText = $(this).text() === 'MORE IMAGES' ? 'LESS IMAGES' : 'MORE IMAGES';
+    $(this).text(newText);
+})
 
+$("#toggleBtn").click(function () {
+    const content = $(".accordion-desc");
+
+    content.toggleClass("expanded");
+
+    if (content.hasClass("expanded")) {
+        $(this).text("READ LESS");
+    } else {
+        $(this).text("READ MORE");
+    }
+});
 // ---------------------------------------------------------------------------
 // Specs / Description / Features accordion
 // ---------------------------------------------------------------------------

@@ -867,6 +867,9 @@ async function handleBoatDetail(req, res) {
 
         const result = await db.boats.findOne(filter);
         console.log(`[Boat Detail] Found boat:`, result ? result.boatTitle : 'NOT FOUND');
+        if (result && result.boatImages) {
+            console.log(`[Boat Detail] Boat has ${result.boatImages.length} images (MORE IMAGES button shows if > 4)`);
+        }
 
         if (!result) {
             console.log('[Boat Detail] Rendering 404 error');
