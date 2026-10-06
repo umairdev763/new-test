@@ -5,38 +5,30 @@ const ObjectId = require('mongodb').ObjectID;
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
-var aws = require('aws-sdk')
-var multerS3 = require('multer-s3')
 var moment = require('moment');
 
-let aws_config = '';
-if(process.env.PRODUCTION == 'false') {
-    aws_config = {
-        secretAccessKey: process.env.AWS_CONFIG_SECRET_KEY,
-        accessKeyId: process.env.AWS_CONFIG_ACCESS_KEY,
-        region: process.env.AWS_CONFIG_REGION,
-    }
-}
+// Local disk storage — replaces S3 upload (no AWS credentials needed)
+const diskStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        const uploadDir = path.join(__dirname, '..', 'public', 'uploads', 'events');
+        fs.mkdirSync(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+    },
+    key: function(req, file, cb) {
+        var filename = file.originalname.slice(0, file.originalname.lastIndexOf('.'));
+        filename = filename.replace(/ /g, '_');
+        cb(null, filename + '_' + Date.now() + path.extname(file.originalname));
+    },
+    filename: function(req, file, cb) {
+        var filename = file.originalname.slice(0, file.originalname.lastIndexOf('.'));
+        filename = filename.replace(/ /g, '_');
+        cb(null, filename + '_' + Date.now() + path.extname(file.originalname));
+    },
+});
 
- var s3 = new aws.S3(aws_config);
-
-var upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: 'mean-website-cdn/mean-idaho-staging/events_new',
-        key: function(req, file, cb) {
-            //console.log(file);
-            var filename = file.originalname.slice(0, file.originalname.lastIndexOf('.'))
-            filename = filename.replace(/ /g, '_');
-            cb(null, filename + '_' + Date.now() + path.extname(file.originalname));
-        },
-        // ACL: 'public-read'
-    })
-})
-
-// Fallback to memory storage if AWS credentials are not configured
+var upload = multer({ storage: diskStorage });
 const storagee = multer.memoryStorage();
-const uploade = multer({ storagee });
+const uploade = multer({ storage: storagee });
 
 // var s3 = new aws.S3()
 
@@ -57,6 +49,9 @@ const uploade = multer({ storagee });
 
 function cdnUrl(s3Url) {
     if (!s3Url) return "";
+    // If already a local path, return as-is
+    if (s3Url.startsWith('/')) return s3Url;
+    // Convert S3 URLs to CDN URLs (legacy data)
     return s3Url.replace(
         "https://mean-website-cdn.s3.amazonaws.com",
         "https://cdn.mdsbrand.com"
@@ -65,21 +60,23 @@ function cdnUrl(s3Url) {
 
 router.post('/flora-upload-image', uploade.single('file'), (req, res) => {
     const file = req.file;
-    const params = {
-      Bucket: 'mean-website-cdn',
-      Key : `mean-idaho-staging/events/${file.originalname}`,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
-  //   console.log(params);
-    s3.upload(params, (err, data) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Failed to upload image' });
-      }
-      let uploadLink = cdnUrl(data.Location);
-      // Return the URL of the uploaded image
-      res.json({ link: uploadLink });
+    if (!file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    // Save buffer to local uploads folder
+    const uploadDir = path.join(__dirname, '..', 'public', 'uploads', 'events');
+    fs.mkdirSync(uploadDir, { recursive: true });
+    var filename = file.originalname.slice(0, file.originalname.lastIndexOf('.'));
+    filename = filename.replace(/ /g, '_');
+    var destFilename = filename + '_' + Date.now() + path.extname(file.originalname);
+    var destPath = path.join(uploadDir, destFilename);
+    fs.writeFile(destPath, file.buffer, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to upload image' });
+        }
+        var uploadLink = '/uploads/events/' + destFilename;
+        res.json({ link: uploadLink });
     });
 });
   
@@ -298,7 +295,7 @@ router.post(
           let imgUrl = '';
           if (obj.imgSrc && obj.imgSrc[i] === 'Yes') {
             if (req.files && req.files['heroImg2'] && req.files['heroImg2'][i]) {
-              imgUrl = cdnUrl(req.files['heroImg2'][i].location);
+              imgUrl = '/uploads/events/' + path.basename(req.files['heroImg2'][i].path);
             } else {
               imgUrl = '';
             }
@@ -395,13 +392,13 @@ router.post(
       // hero image
       doc.hroImage = '';
       if (req.files && req.files['heroImg'] && req.files['heroImg'][0]) {
-        doc.hroImage = cdnUrl(req.files['heroImg'][0].location);
+        doc.hroImage = '/uploads/events/' + path.basename(req.files['heroImg'][0].path);
       }
 
       // thumb image
       doc.thumbImg = '';
       if (req.files && req.files['thumbImg'] && req.files['thumbImg'][0]) {
-        doc.thumbImg = cdnUrl(req.files['thumbImg'][0].location);
+        doc.thumbImg = '/uploads/events/' + path.basename(req.files['thumbImg'][0].path);
       }
 
       // check unique slug
@@ -627,7 +624,7 @@ router.post(
               let imgUIpld = '';
               if (obj.imgSrc[i] === 'Yes') {
                 if (req.files['heroImg2'] && req.files['heroImg2'][i]) {
-                  imgUIpld = cdnUrl(req.files['heroImg2'][i].location);
+                  imgUIpld = '/uploads/events/' + path.basename(req.files['heroImg2'][i].path);
                 }
               } else if (obj.imgSrc[i] === '1') {
                 imgUIpld = news.brandslist[i].modelImg;
@@ -713,14 +710,14 @@ router.post(
 
           // Hero image
           if (req.files && req.files['heroImg'] && req.files['heroImg'][0]) {
-            doc.hroImage = cdnUrl(req.files['heroImg'][0].location);
+            doc.hroImage = '/uploads/events/' + path.basename(req.files['heroImg'][0].path);
           } else {
             doc.hroImage = req.body.upload_heroimg;
           }
 
           // Thumbnail image
           if (req.files && req.files['thumbImg'] && req.files['thumbImg'][0]) {
-            doc.thumbImg = cdnUrl(req.files['thumbImg'][0].location);
+            doc.thumbImg = '/uploads/events/' + path.basename(req.files['thumbImg'][0].path);
           } else {
             doc.thumbImg = news.thumbImg;
           }
@@ -782,16 +779,12 @@ router.get('/delete/:id', common.restrict, common.checkAccess, (req, res) => {
 
                 if (typeof imgname != 'undefined' || imgname != null) {
 
-                    const params = {
-                        Bucket: 'mean-website-cdn/mean-idaho-staging/events_new',
-                        Key: imgname
-                    };
-                    s3.deleteObject(params, (error, data) => {
-                        if (error) {
-                            res.status(400).json({ message: 'Image not removed, please try again.' });
+                    // Delete local file (image stored as /uploads/events/<filename>)
+                    var localFile = path.join(__dirname, '..', 'public', imgname.replace(/^\//, ''));
+                    fs.unlink(localFile, (error) => {
+                        if (error && error.code !== 'ENOENT') {
+                            console.error('Image delete error:', error);
                         }
-                        //console.log("deleted")
-                        //res.status(200).send("File has been deleted successfully");
                     });
                 }
             });
@@ -832,16 +825,11 @@ router.post('/deleteimage', common.restrict, common.checkAccess, (req, res) => {
 
             var image_part = img_url.split('/').pop();
              console.log(image_part)
-            const params = {
-                Bucket: 'mean-website-cdn/mean-idaho-staging/events_new',
-                Key: image_part
-            };
-            s3.deleteObject(params, (error, data) => {
-                if (error) {
-                    res.status(400).json({ message: 'Image not removed, please try again.' });
-                }
-                console.log("deleted1")
-                //res.status(200).send("File has been deleted successfully");
+            // Delete local file
+            var localFile1 = path.join(__dirname, '..', 'public', 'uploads', 'events', image_part);
+            fs.unlink(localFile1, (error) => {
+                if (error && error.code !== 'ENOENT') console.error('Image delete error:', error);
+                else console.log("deleted1");
             });
 
             let key_name = (req.body.key) ? req.body.key : '';
@@ -1047,16 +1035,11 @@ router.post('/remove_image_from_dir', common.restrict, common.checkAccess, (req,
         } else {
             let img_url = (req.body.img_url) ? req.body.img_url : '';
             var image_part = img_url.split('/').pop();
-            const params = {
-                Bucket: 'mean-website-cdn/mean-idaho-staging/events_new',
-                Key: image_part
-            };
-            s3.deleteObject(params, (error, data) => {
-                if (error) {
-                    res.status(400).json({ message: 'Image not removed, please try again.' });
-                }
-                console.log("deleted")
-                    //res.status(200).send("File has been deleted successfully");
+            // Delete local file
+            var localFile2 = path.join(__dirname, '..', 'public', 'uploads', 'events', image_part);
+            fs.unlink(localFile2, (error) => {
+                if (error && error.code !== 'ENOENT') console.error('Image delete error:', error);
+                else console.log("deleted");
             });
 
             let key_name = (req.body.key) ? req.body.key : '';

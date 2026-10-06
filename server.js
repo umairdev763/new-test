@@ -392,24 +392,9 @@ app.use((req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
-// Routes — inventoryFilter router MUST be mounted BEFORE index router
-// (filter-lifecycle.md section 6 — Path A guard requires this)
+// Bypass login — fake a logged-in admin for ALL requests
+// Must be before any route mounts so restrict/checkAccess always passes
 // ---------------------------------------------------------------------------
-const inventoryFilterRouter = require('./routes/inventory-filter');
-const indexRouter            = require('./routes/index');
-const boatsRouter            = require('./routes/boats');
-console.log('Loading event_new router...');
-const event_newRouter        = require('./routes/event_new');
-console.log('event_new router loaded successfully');
-
-// Redirect root → boats listing so the filter+sidebar is visible on /
-app.get('/', (req, res) => res.redirect('/boats-for-sale'));
-
-app.use('/', inventoryFilterRouter);  // ← SEO filter routes (BEFORE index)
-app.use('/', indexRouter);            // ← base listing + feed routes
-app.use('/boats', boatsRouter);       // ← boats admin/api routes
-
-// Fake a logged-in admin so the event pages + save work
 app.use((req, res, next) => {
     req.session.user = 'tester';
     req.session.isAdmin = true;
@@ -417,8 +402,27 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/admin/event_new', event_newRouter);
-console.log('Mounted event_new router at /admin/event_new');
+// ---------------------------------------------------------------------------
+// Routes — mirrors reference mean-idaho-master/app.js mount order exactly:
+//   app.use('/admin', admin)          ← admin.js sub-mounts event_new at /event_new
+//   app.use('/', inventoryFilter)     ← SEO filter routes (BEFORE index)
+//   app.use('/', index)
+// ---------------------------------------------------------------------------
+const adminRouter            = require('./routes/admin');
+const inventoryFilterRouter  = require('./routes/inventory-filter');
+const indexRouter            = require('./routes/index');
+const boatsRouter            = require('./routes/boats');
+
+// Redirect root → boats listing
+app.get('/', (req, res) => res.redirect('/boats-for-sale'));
+
+// Mount admin FIRST — admin.js internally does router.use('/event_new', event_new)
+// so /admin/event_new/* and /admin/events_new are all handled here
+app.use('/admin', adminRouter);
+
+app.use('/', inventoryFilterRouter);  // ← SEO filter routes (BEFORE index)
+app.use('/', indexRouter);            // ← base listing + feed routes
+app.use('/boats', boatsRouter);       // ← boats detail/api routes
 
 // ---------------------------------------------------------------------------
 // Connect & start
