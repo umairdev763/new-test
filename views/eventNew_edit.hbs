@@ -1,5 +1,36 @@
-{{> hyper_menu}}
-{{> sandbox_banner}}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+
+    {{#if hyper_admin}}
+    <!--Hyper Admin Backend Pages Styles -->
+    <!-- Vendor css -->
+    <link href="/assets/hyper/css/vendor.min.css" rel="stylesheet" type="text/css" />
+    <!-- App css -->
+    <link href="/assets/hyper/css/app-saas.min.css" rel="stylesheet" type="text/css" id="app-style" />
+    <!-- Icons css -->
+    <link href="/assets/hyper/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- My Custom Css for Hyper Admin -->
+    <link rel="stylesheet" href="/assets/css/hyper_admin.css">
+    <!-- Theme Config Js -->
+    <script src="/assets/hyper/js/hyper-config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    {{/if}}
+
+    {{#each styles}}
+    <link href="{{this.url}}" rel="stylesheet" type="text/css" />
+    {{/each}}
+
+    {{#each scripts}}
+    <script src="{{this.script}}"></script>
+    {{/each}}
+
 <style>
     input[name="inventory"],
     input[name="websiteToShow"] {
@@ -675,25 +706,48 @@ div#cstForlaHeight .fr-box {
 }
 
 </style>
-<div class="content-page">
-    <div class="col-md-12 main_content">
-        <div class="col-lg-12">
 
-            <div class="card">
-                <form method="post" class="form-horizontal" id="insert_form" action="/admin/event_new/update"
-                    data-toggle="validator" enctype="multipart/form-data">
-                         <input type="hidden" name="frmboatId" id="frmboatId" value="{{result._id}}" />
-                         <input type="hidden" name="senderId" id="senderId" value="" />
-                    <div class="row">
-                        <div class="col-lg-9">
-                          <div class="d-flex card-header justify-content-between align-items-center">
-                        <h4 class="header-title">Edit Event</h4>
-                        {{!-- <button id="frm_edit_employment_save" class="btn btn-primary" type="submit">Add Event
-                        </button> --}}
+</head>
 
+<body class="hold-transition sidebar-mini">
+    <!-- ============================================================== -->
+    <!-- Start Wrapper -->
+    <!-- ============================================================== -->
+    <div id="wrapper">
+
+        {{> hyper_menu}}
+        {{> sandbox_banner}}
+
+        <!-- ============================================================== -->
+        <!-- Start Page Content Here -->
+        <!-- ============================================================== -->
+
+        <div class="content-page">
+    <div class="content">
+
+        <!-- Start Content-->
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box">
+                        <h4 class="page-title">Edit Event</h4>
                     </div>
+                </div>
+            </div>
 
-                    <div class="card-body pt-0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card mb-4">
+
+                        <form method="post" class="form-horizontal" id="insert_form" action="/admin/event_new/update"
+                            data-toggle="validator" enctype="multipart/form-data">
+                             <input type="hidden" name="frmboatId" id="frmboatId" value="{{result._id}}" />
+                            <div class="row">
+                                <div class="col-lg-9">
+                                   <div class="d-flex card-header justify-content-between align-items-center">
+                            </div>
+                            <div class="card-body pt-0">
                         <div class="form-group mb-3">
 
                             <div class="col-sm-12 mb-3">
@@ -845,7 +899,7 @@ div#cstForlaHeight .fr-box {
                                 </div>
                                 <div class="col-sm-6">
                                     <label for="" class=" form-label">Phone</label>
-                                    <input type="tel" class="form-control" id="phone" placeholder="" name="phone"
+                                    <input type="tel" class="form-control phoneInput" id="phone" placeholder="" name="phone"
                                         value="{{result.phone}}">
                                 </div>
                             </div>
@@ -1024,17 +1078,37 @@ div#cstForlaHeight .fr-box {
                         </div>
                         <h2>Edit Event</h2>
                     </div> --}}
-                    
 
-                </form>
-                 <div class="hypertheme-version">
+
+                        </form>
+
+                       <div class="hypertheme-version">
                             <strong>Version 1.2.0</strong><p></p>
                         </div>
-            </div>
+                    </div> <!-- end card-->
+                </div> <!-- end col-->
+            </div> <!-- end row-->
 
         </div>
+        <!-- container -->
+
     </div>
+    <!-- content -->
+
+    <!-- Footer Start -->
+      {{> hyper_footer}}
+    <!-- end Footer -->
+
 </div>
+
+<!-- ============================================================== -->
+<!-- End Page content -->
+<!-- ============================================================== -->
+
+</div>
+
+</body>
+</html>
 
 
 <script type="text/javascript" src="/assets/js/froala_editor_new/js/froala_editor.min.js"></script>
@@ -1181,64 +1255,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-    function getIp(callback) {
- fetch('ipinfo.io/140.82.183.34?token=66e2f39b20a2bd', { headers: { 'Accept': 'application/json' }})
-   .then((resp) => resp.json())
-   .catch(() => {
-     return {
-       country: 'us',
-     };
-   })
-   .then((resp) => callback(resp.country));
-}
-
- const phoneInputField = document.querySelector("#phone");
-   const phoneInput = window.intlTelInput(phoneInputField, {
-     utilsScript:
-       "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-   });
-
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const phoneInputFields = document.querySelectorAll(".phoneInput");
+            phoneInputFields.forEach(function (phoneInputField) {
+                const iti = window.intlTelInput(phoneInputField, {
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                    initialCountry: "us",
+                });
+                phoneInputField.iti = iti;
+            });
+    });
 </script>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-    const socket = io();
-    const editId = "{{result._id}}"
-    const clientId = crypto.randomUUID();
-    document.getElementById('senderId').value = clientId
+    // Initialize flatpickr for event dates (matching reference implementation)
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr("#inline-datepicker", {
+                dateFormat: "Y-m-d",
+                allowInput: true,
+                inline: true
+            });
 
-    const pageId = 'event_edit';
-    
-    // Join this page's room
-    socket.emit('join-page', pageId);
+            // Initialize time pickers for start and end times
+            flatpickr("#event_star_time\\[0\\]", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: false
+            });
 
-    // Listen for updates specific to this page
-    socket.on('page-alert', (data) => {
-        if (data.senderId === clientId) return;
-        if(data.documentId !== editId) return;
-        if (data.pageId === pageId) {
-            Swal.fire({
-                title: '🔔 Update Available!',
-                text: data.message,
-                icon: 'info',
-
-                showConfirmButton: true,
-                confirmButtonText: 'Refresh Page',
-
-                showCloseButton: true,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-
-                backdrop: true
-            }).then((result) => {
-                // Refresh only when user clicks confirm
-                if (result.isConfirmed) {
-                    window.location.reload();
-                }
+            flatpickr("#event_end_time\\[0\\]", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: false
             });
         }
     });
-  
 </script>

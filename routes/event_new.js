@@ -1,7 +1,7 @@
 const express = require('express');
 const common = require('../lib/common');
 const router = express.Router();
-const ObjectId = require('mongodb').ObjectID;
+const { ObjectId } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -88,47 +88,41 @@ router.post('/insert_category', common.restrict, common.checkAccess, async(req, 
                 category_slug: req.body.category_slug,
                 category_desc: req.body.category_desc
             };
-    db.events_category.insert(tag, (err, newDoc) => {
-        if (err) {
-            console.log(colors.red('Error inserting document: ' + err));
-            req.session.message = 'Error: Inserting news category';
-            req.session.messageType = 'danger';
-            res.status(400).json({ message: 'Error Inserting News Category' });
-        } else {
-            console.log('Category Added');
-            let events_catgory = newDoc.ops[0].events_category;
-            let categoryId = newDoc.ops[0]._id; // Get the newly inserted category ID
-            res.status(201).json({ 
-                message: 'Category Added', 
-                success: true, 
-                events_catgory,
-                _id: categoryId  // Send the category ID back
-            });
-        }
-    });
+    try {
+        const newDoc = await db.events_category.insertOne(tag);
+        console.log('Category Added');
+        res.status(201).json({
+            message: 'Category Added',
+            success: true,
+            events_catgory: tag.events_category,
+            _id: newDoc.insertedId
+        });
+    } catch (err) {
+        console.error('Error inserting document: ' + err);
+        req.session.message = 'Error: Inserting news category';
+        req.session.messageType = 'danger';
+        res.status(400).json({ message: 'Error Inserting News Category' });
+    }
 });
 
-router.delete('/delete_event_category/:id', common.restrict, common.checkAccess, (req, res) => {
+router.delete('/delete_event_category/:id', common.restrict, common.checkAccess, async (req, res) => {
     const db = req.app.db;
     const categoryId = common.getId(req.params.id);
 
     console.log(`Attempting to delete category with ID: ${categoryId}`); // Debugging log
 
-    // Remove the category from the database
-    db.events_category.remove({ _id: categoryId }, {}, (err, numRemoved) => {
-        if (err) {
-            console.error('Error deleting category:', err.stack); // Debugging log
-            return res.status(500).json({ success: false, message: 'Failed to delete category' });
-        }
-
-        if (numRemoved === 0) {
-            console.log('No category found with ID:', categoryId); // Debugging log
+    try {
+        const result = await db.events_category.deleteOne({ _id: categoryId });
+        if (result.deletedCount === 0) {
+            console.log('No category found with ID:', categoryId);
             return res.status(404).json({ success: false, message: 'Category not found' });
         }
-
-        console.log('Category successfully deleted:', categoryId); // Debugging log
+        console.log('Category successfully deleted:', categoryId);
         res.status(200).json({ success: true, message: 'Category successfully deleted' });
-    });
+    } catch (err) {
+        console.error('Error deleting category:', err.stack);
+        return res.status(500).json({ success: false, message: 'Failed to delete category' });
+    }
 });
 
 // insert form
@@ -197,8 +191,6 @@ router.post(
   async (req, res) => {
     const db = req.app.db;
     const moment = require('moment-timezone');
-    const mongo = require('mongodb');
-    const ObjectID = mongo.ObjectID;
     try {
       const obj = JSON.parse(JSON.stringify(req.body));
       const dateLength = Number(req.body.event_date_length) || 0;
@@ -253,7 +245,7 @@ router.post(
       let sortBydate = null;
       for (let i = 0; i < dateLength; i++) {
         events.push({
-          _id: new ObjectID(),
+          _id: new ObjectId(),
           eventDate: obj.event_start_date ? obj.event_start_date[i] : '',
           eventTimeStart: obj.event_star_time ? obj.event_star_time[i] : '',
           eventTimeEnd: obj.event_end_time ? obj.event_end_time[i] : ''
@@ -284,7 +276,7 @@ router.post(
           if (Array.isArray(obj[`modelTitle${i}`])) {
             combined = obj[`modelTitle${i}`].map((item, index) => {
               return {
-                _id: new ObjectID(),
+                _id: new ObjectId(),
                 model_title: obj[`modelTitle${i}`][index],
                 model_link: obj[`modelLink${i}`] ? obj[`modelLink${i}`][index] : ''
               };
@@ -302,7 +294,7 @@ router.post(
           }
 
           const brandObj = {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             brand: obj[`modelName${i}`],
             showBrand: obj.showBrand ? obj.showBrand[i] : undefined,
             modelImg: imgUrl,
@@ -410,15 +402,8 @@ router.post(
       }
 
       // insert document
-      const insertResult = await db.events_new.insertOne ? await db.events_new.insertOne(doc) : await new Promise((resolve, reject) => {
-        db.events_new.insert(doc, (err, newDoc) => {
-          if (err) return reject(err);
-          return resolve(newDoc);
-        });
-      });
-
-      // get inserted id (support both insertOne and legacy insert)
-      const newId = insertResult.insertedId || (insertResult.insertedIds && insertResult.insertedIds[0]);
+      const insertResult = await db.events_new.insertOne(doc);
+      const newId = insertResult.insertedId;
 
       req.session.message = 'New event successfully created';
       req.session.messageType = 'success';
@@ -525,8 +510,6 @@ router.post(
   ]),
   async (req, res) => {
     const db = req.app.db;
-    const mongo = require('mongodb');
-    const ObjectID = mongo.ObjectID;
     const obj = JSON.parse(JSON.stringify(req.body));
 
     // Handle event delete date
@@ -536,33 +519,10 @@ router.post(
       newDeleteDate = new Date(formattedDate);
     }
 
-    // Convert month name to number
     function getMonthNumber(monthName) {
-      const months = {
-        January: 1,
-        February: 2,
-        March: 3,
-        April: 4,
-        May: 5,
-        June: 6,
-        July: 7,
-        August: 8,
-        September: 9,
-        October: 10,
-        November: 11,
-        December: 12
-      };
+      const months = { January:1,February:2,March:3,April:4,May:5,June:6,July:7,August:8,September:9,October:10,November:11,December:12 };
       const formatted = monthName.charAt(0).toUpperCase() + monthName.slice(1).toLowerCase();
       return months[formatted] || null;
-    }
-
-    // Date converter (not used but kept)
-    function dateConvrtr(dateStrng) {
-      let dateArr = dateStrng.split(',');
-      let dateHlf = dateArr[0].split(' ');
-      dateArr[1] = dateArr[1] ? dateArr[1].trim() : '';
-      let newDate = `${dateArr[1]}/${getMonthNumber(dateHlf[0])}/${dateHlf[1]}`;
-      return newDate;
     }
 
     // Prepare events
@@ -576,190 +536,167 @@ router.post(
 
     for (let i = 0; i < req.body.event_date_length; i++) {
       events.push({
-        _id: new ObjectID(),
+        _id: new ObjectId(),
         eventDate: obj.event_start_date[i],
         eventTimeStart: obj.event_star_time[i],
         eventTimeEnd: obj.event_end_time[i]
       });
     }
 
-    // Find existing event
-    db.events_new.findOne({ _id: common.getId(req.body.frmboatId) }, async (err, news) => {
-      if (err) {
-        req.session.message = 'Failed updating boat.';
+    try {
+      // Find existing event
+      const news = await db.events_new.findOne({ _id: common.getId(req.body.frmboatId) });
+      if (!news) {
+        req.session.message = 'Event not found.';
         req.session.messageType = 'danger';
         return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
       }
 
-      db.events_new.count(
-        { eventSlug: obj.eventSlug, _id: { $ne: common.getId(req.body.frmboatId) } },
-        async (err, count) => {
-          if (err) {
-            req.session.message = 'Failed updating boat.';
-            req.session.messageType = 'danger';
-            return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
+      // Check slug uniqueness
+      const slugCount = await db.events_new.countDocuments({
+        eventSlug: obj.eventSlug,
+        _id: { $ne: common.getId(req.body.frmboatId) }
+      });
+
+      if (slugCount > 0 && obj.eventSlug !== '') {
+        req.session.message = 'Event Slug already exists. Pick a new one.';
+        req.session.messageType = 'danger';
+        return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
+      }
+
+      // Build brands list
+      let result = [];
+      for (let i = 0; i < obj.event_model_length; i++) {
+        if (obj[`modelName${i}`]) {
+          let combined = [];
+          if (obj[`modelTitle${i}`]) {
+            combined = obj[`modelTitle${i}`].map((item, index) => ({
+              _id: new ObjectId(),
+              model_title: obj[`modelTitle${i}`][index],
+              model_link: obj[`modelLink${i}`] ? obj[`modelLink${i}`][index] : ''
+            }));
           }
 
-          if (count > 0 && obj.eventSlug !== '') {
-            req.session.message = 'Event Slug already exists. Pick a new one.';
-            req.session.messageType = 'danger';
-            return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
-          }
-
-          // Build brands list
-          let result = [];
-          for (let i = 0; i < obj.event_model_length; i++) {
-            if (obj[`modelName${i}`]) {
-              let combined = [];
-              if (obj[`modelTitle${i}`]) {
-                combined = obj[`modelTitle${i}`].map((item, index) => {
-                  return {
-                    _id: new ObjectID(),
-                    model_title: obj[`modelTitle${i}`][index],
-                    model_link: obj[`modelLink${i}`][index]
-                  };
-                });
-              }
-
-              let imgUIpld = '';
-              if (obj.imgSrc[i] === 'Yes') {
-                if (req.files['heroImg2'] && req.files['heroImg2'][i]) {
-                  imgUIpld = '/uploads/events/' + path.basename(req.files['heroImg2'][i].path);
-                }
-              } else if (obj.imgSrc[i] === '1') {
-                imgUIpld = news.brandslist[i].modelImg;
-              }
-
-              result.push({
-                _id: new ObjectID(),
-                brand: obj[`modelName${i}`],
-                showBrand: obj.showBrand && obj.showBrand[i] ? obj.showBrand[i] : 'No',
-                modelImg: imgUIpld,
-                model: combined
-              });
+          let imgUIpld = '';
+          if (obj.imgSrc && obj.imgSrc[i] === 'Yes') {
+            if (req.files && req.files['heroImg2'] && req.files['heroImg2'][i]) {
+              imgUIpld = '/uploads/events/' + path.basename(req.files['heroImg2'][i].path);
             }
+          } else if (obj.imgSrc && obj.imgSrc[i] === '1') {
+            imgUIpld = news.brandslist && news.brandslist[i] ? news.brandslist[i].modelImg : '';
           }
 
-          // Inventory
-          let newInv = [];
-          if (typeof obj.inventory === 'string') newInv.push(obj.inventory);
-          else newInv = obj.inventory ? obj.inventory : [];
-
-          let boatInv = await db.boats.find({ calleriq_boat_id: { $in: newInv } }).toArray();
-          let newBoat = [];
-          newInv.map(id => {
-            const botObj = boatInv.find(b => b.calleriq_boat_id === id);
-            if (botObj) {
-              newBoat.push({
-                calleriq_boat_id: botObj.calleriq_boat_id,
-                boatTitle: botObj.boatTitle,
-                productImage: botObj.productImage,
-                sale_price: botObj.sale_price,
-                boatPermalink: botObj.boatPermalink,
-                stockNumber: botObj.stock_number
-              });
-            }
+          result.push({
+            _id: new ObjectId(),
+            brand: obj[`modelName${i}`],
+            showBrand: obj.showBrand && obj.showBrand[i] ? obj.showBrand[i] : 'No',
+            modelImg: imgUIpld,
+            model: combined
           });
-
-          // Dates
-          const currentDate = new Date();
-          const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-
-          if (req.body.event_status === 'Publish' || req.body.event_status === 'Scheduled') {
-            const blogDate = moment(new Date()).tz('America/Los_Angeles').format();
-            if (req.body.publish_date > blogDate) {
-              req.body.event_status = 'Scheduled';
-            }
-          }
-
-          // Build doc
-          let doc = {
-            eventTitle: obj.eventTitle,
-            eventSlug: obj.eventSlug,
-            metaTitle: obj.metaTitle,
-            metaDesc: obj.metaDesc,
-            Excerpt: obj.Excerpt,
-            promotion: obj.promotion ? 'Yes' : 'No',
-            events: events,
-            event_end_date: obj.event_end_date,
-            event_delete_date: newDeleteDate,
-            strtDateOfEvnt: strtDateOfEvnt,
-            sortByStrtDate: sortBydate,
-            eventDesc: obj.eventDesc,
-            locname: obj.locname,
-            Status: obj.event_status,
-            event_publish_date: req.body.publish_date !== '' ? req.body.publish_date : formattedDate,
-            street: obj.street,
-            city: obj.city,
-            state: obj.state,
-            zipcode: obj.zipcode,
-            phone: obj.phone,
-            modlTitl: obj.modlTitl,
-            invTitle: obj.invTitle,
-            btnTitle: obj.btnTitle,
-            formCode: obj.formCode,
-            event_category: obj.category_val,
-            brandslist: result,
-            inventory: newBoat,
-            showWebArr: Array.isArray(obj.websitesToShow)
-              ? obj.websitesToShow
-              : obj.websitesToShow
-              ? [obj.websitesToShow]
-              : []
-          };
-
-          // Hero image
-          if (req.files && req.files['heroImg'] && req.files['heroImg'][0]) {
-            doc.hroImage = '/uploads/events/' + path.basename(req.files['heroImg'][0].path);
-          } else {
-            doc.hroImage = req.body.upload_heroimg;
-          }
-
-          // Thumbnail image
-          if (req.files && req.files['thumbImg'] && req.files['thumbImg'][0]) {
-            doc.thumbImg = '/uploads/events/' + path.basename(req.files['thumbImg'][0].path);
-          } else {
-            doc.thumbImg = news.thumbImg;
-          }
-
-          // Update DB
-          db.events_new.updateOne(
-            { _id: common.getId(req.body.frmboatId) },
-            { $set: doc },
-            (err) => {
-              if (err) {
-                req.session.message = 'Failed to save. Please try again';
-                req.session.messageType = 'danger';
-                return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
-              } else {
-                const io = req.app.get('io');
-                io.to(`page-event_edit`).emit('page-alert', {
-                    message: `${req.session.usersName} has made changes to this event. Please refresh the page to view the latest version.`,
-                    pageId:'event_edit',
-                    senderId: req.body.senderId,
-                    documentId: req.body.frmboatId
-                });
-                req.session.message = 'Successfully saved';
-                req.session.messageType = 'success';
-                return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
-              }
-            }
-          );
         }
+      }
+
+      // Inventory
+      let newInv = [];
+      if (typeof obj.inventory === 'string') newInv.push(obj.inventory);
+      else newInv = obj.inventory ? obj.inventory : [];
+
+      let boatInv = newInv.length > 0 ? await db.boats.find({ calleriq_boat_id: { $in: newInv } }).toArray() : [];
+      let newBoat = newInv.map(id => {
+        const botObj = boatInv.find(b => b.calleriq_boat_id === id);
+        return botObj ? {
+          calleriq_boat_id: botObj.calleriq_boat_id,
+          boatTitle: botObj.boatTitle,
+          productImage: botObj.productImage,
+          sale_price: botObj.sale_price,
+          boatPermalink: botObj.boatPermalink,
+          stockNumber: botObj.stock_number
+        } : null;
+      }).filter(Boolean);
+
+      // Dates
+      const currentDate = new Date();
+      const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
+
+      if (req.body.event_status === 'Publish' || req.body.event_status === 'Scheduled') {
+        const blogDate = moment(new Date()).tz('America/Los_Angeles').format();
+        if (req.body.publish_date > blogDate) req.body.event_status = 'Scheduled';
+      }
+
+      // Build doc
+      let doc = {
+        eventTitle: obj.eventTitle,
+        eventSlug: obj.eventSlug,
+        metaTitle: obj.metaTitle,
+        metaDesc: obj.metaDesc,
+        Excerpt: obj.Excerpt,
+        promotion: obj.promotion ? 'Yes' : 'No',
+        events: events,
+        event_end_date: obj.event_end_date,
+        event_delete_date: newDeleteDate,
+        strtDateOfEvnt: strtDateOfEvnt,
+        sortByStrtDate: sortBydate,
+        eventDesc: obj.eventDesc,
+        locname: obj.locname,
+        Status: obj.event_status,
+        event_publish_date: req.body.publish_date !== '' ? req.body.publish_date : formattedDate,
+        street: obj.street,
+        city: obj.city,
+        state: obj.state,
+        zipcode: obj.zipcode,
+        phone: obj.phone,
+        modlTitl: obj.modlTitl,
+        invTitle: obj.invTitle,
+        btnTitle: obj.btnTitle,
+        formCode: obj.formCode,
+        event_category: obj.category_val,
+        brandslist: result,
+        inventory: newBoat,
+        showWebArr: Array.isArray(obj.websitesToShow) ? obj.websitesToShow : (obj.websitesToShow ? [obj.websitesToShow] : [])
+      };
+
+      // Hero image
+      if (req.files && req.files['heroImg'] && req.files['heroImg'][0]) {
+        doc.hroImage = '/uploads/events/' + path.basename(req.files['heroImg'][0].path);
+      } else {
+        doc.hroImage = req.body.upload_heroimg;
+      }
+
+      // Thumbnail image
+      if (req.files && req.files['thumbImg'] && req.files['thumbImg'][0]) {
+        doc.thumbImg = '/uploads/events/' + path.basename(req.files['thumbImg'][0].path);
+      } else {
+        doc.thumbImg = news.thumbImg;
+      }
+
+      // Update DB
+      await db.events_new.updateOne(
+        { _id: common.getId(req.body.frmboatId) },
+        { $set: doc }
       );
-    });
+
+      req.session.message = 'Successfully saved';
+      req.session.messageType = 'success';
+      return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
+
+    } catch (err) {
+      console.error('Error in /update route:', err);
+      req.session.message = 'Failed to save. Please try again';
+      req.session.messageType = 'danger';
+      return res.redirect('/admin/event_new/edit/' + req.body.frmboatId);
+    }
   }
 );
 
 
 
 // delete news
-router.get('/delete/:id', common.restrict, common.checkAccess, (req, res) => {
+router.get('/delete/:id', common.restrict, common.checkAccess, async (req, res) => {
     const db = req.app.db;
     var https = require('https');
     all_boat_images = [];
     // console.log(req.params.id)
-    db.events_new.findOne({ _id: common.getId(req.params.id) }, (err, evt) => {
+    db.events_new.findOne({ _id: common.getId(req.params.id) }, async (err, evt) => {
 
         if (err) {
             console.info(err.stack);
@@ -793,21 +730,10 @@ router.get('/delete/:id', common.restrict, common.checkAccess, (req, res) => {
     });
 
     // remove the article
-    db.events_new.remove({ _id: common.getId(req.params.id) }, {}, (err, numRemoved) => {
-        if (err) {
-            console.info(err.stack);
-        }
-
-        // redirect home
-        req.session.message = 'Event successfully deleted';
-        req.session.messageType = 'success';
-        res.redirect('/admin/events_new');
-
-                            var responses = [];
-                            var completed_requests = 0;
-                           
-
-    });
+    await db.events_new.deleteOne({ _id: common.getId(req.params.id) });
+    req.session.message = 'Event successfully deleted';
+    req.session.messageType = 'success';
+    res.redirect('/admin/events_new');
 });
 
 // deletes a boat image
@@ -833,8 +759,8 @@ router.post('/deleteimage', common.restrict, common.checkAccess, (req, res) => {
             });
 
             let key_name = (req.body.key) ? req.body.key : '';
-            const parentId = ObjectId(req.body._id);
-            const childId = ObjectId(req.body.imgId)
+            const parentId = new ObjectId(req.body._id);
+            const childId = new ObjectId(req.body.imgId)
             const filter = { _id: parentId, 'brandslist._id': childId };
             const update = { $set: { 'brandslist.$.modelImg': '' } };
             const result =  db.events_new.updateOne(filter, update ,(err,numReplaced) =>{
@@ -856,72 +782,46 @@ router.post('/deleteimage', common.restrict, common.checkAccess, (req, res) => {
 })
 
 
-router.all('/new__event_category', common.restrict, (req, res, next) => {
+router.all('/new__event_category', common.restrict, async (req, res, next) => {
     const db = req.app.db;
     const config = req.app.config;
-
-   
     const page = req.query.page ? parseInt(req.query.page, 10) - 1 : 0;
     const limit = 20;
- 
     const searchQuery = req.query.search ? req.query.search.trim() : "";
+    const filter = searchQuery ? { events_category: { $regex: new RegExp(searchQuery, "i") } } : {};
 
-   
-    const filter = searchQuery
-        ? { events_category: { $regex: new RegExp(searchQuery, "i") } } 
-        : {};
+    try {
+        const count = await db.events_category.countDocuments(filter);
+        const topResults = await db.events_category.find(filter).sort({}).skip(page * limit).limit(limit).toArray();
 
- 
-    db.events_category.find(filter).count((err, count) => {
-        if (err) {
-            console.error("Error counting categories:", err);
-            req.session.message = "Failed to load categories.";
-            req.session.messageType = "danger";
-            return res.redirect("/admin/event_new/new__event_category");
-        }
+        const noOfPages = Math.ceil(count / limit);
+        const styles = common.getAdminStyles();
+        const scripts = common.getHyperAdminPageScripts();
+        scripts.push({ script: '/assets/js/fancybox/3.0.47/jquery.fancybox.min.js', comment: '' });
 
-       
-        db.events_category.find(filter)
-            .sort({}) 
-            .skip(page * limit)
-            .limit(limit)
-            .toArray((err, topResults) => {
-                if (err) {
-                    console.error("Error fetching categories:", err);
-                    req.session.message = "Failed to load categories.";
-                    req.session.messageType = "danger";
-                    return res.redirect("/admin/event_new/new__event_category");
-                }
-
-                // Prepare the response
-                const noOfPages = Math.ceil(count / limit);
-                const styles = common.getAdminStyles();
-                const scripts = common.getHyperAdminPageScripts();
-
-                scripts.push({
-                    script: '/assets/js/fancybox/3.0.47/jquery.fancybox.min.js',
-                    comment: ''
-                });
-
-                res.header('Cache-Control', 'no-cache');
-                res.render('new_event_category', {
-                    title: 'Event Category',
-                    top_results: topResults,
-                    session: req.session,
-                    admin: true,
-                    hyper_admin: true,
-                    pageCount: noOfPages,
-                    current_page: page + 1,
-                    config: config,
-                    scripts: scripts,
-                    styles: styles,
-                    message: common.clearSessionValue(req.session, 'message'),
-                    messageType: common.clearSessionValue(req.session, 'messageType'),
-                    helpers: req.handlebars.helpers,
-                    searchQuery, // Pass the search query back to the view
-                });
-            });
-    });
+        res.header('Cache-Control', 'no-cache');
+        res.render('new_event_category', {
+            title: 'Event Category',
+            top_results: topResults,
+            session: req.session,
+            admin: true,
+            hyper_admin: true,
+            pageCount: noOfPages,
+            current_page: page + 1,
+            config: config,
+            scripts: scripts,
+            styles: styles,
+            message: common.clearSessionValue(req.session, 'message'),
+            messageType: common.clearSessionValue(req.session, 'messageType'),
+            helpers: req.handlebars.helpers,
+            searchQuery,
+        });
+    } catch (err) {
+        console.error("Error loading categories:", err);
+        req.session.message = "Failed to load categories.";
+        req.session.messageType = "danger";
+        return res.redirect("/admin/event_new/new__event_category");
+    }
 });
 
 // Update News Category
@@ -953,7 +853,7 @@ router.post('/event_category_update', common.restrict, async (req, res) => {
         }
 
         // Check for duplicate categories
-        const count = await db.news_category.count({
+        const count = await db.news_category.countDocuments({
             news_category: category_val,
             _id: { $ne: common.getId(news._id) },
         });
@@ -971,7 +871,7 @@ router.post('/event_category_update', common.restrict, async (req, res) => {
             category_desc,
         };
 
-        await db.news_category.update({ _id: common.getId(frmboatId) }, { $set: doc });
+        await db.news_category.updateOne({ _id: common.getId(frmboatId) }, { $set: doc });
 
         req.session.message = 'Category updated successfully.';
         req.session.messageType = 'success';
@@ -1055,12 +955,9 @@ router.post('/remove_image_from_dir', common.restrict, common.checkAccess, (req,
             //           // console.log(query_to_match) 
             //            //console.log(deleteimage)
 
-            db.events_new.update(query_to_match, deleteimage, (err, numReplaced) => {
-                if (err) {
-                    console.info(err.stack)
-                }
-                res.status(200).send("Image Successfully Removed")
-            })
+            db.events_new.updateOne(query_to_match, deleteimage)
+                .then(() => res.status(200).send("Image Successfully Removed"))
+                .catch(err => { console.info(err.stack); res.status(500).send("Error removing image"); });
 
 
         }

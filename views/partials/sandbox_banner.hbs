@@ -244,25 +244,47 @@
 		hideCloseButton: true
 	});
 
-	document.querySelector("#msgboxPersistent").addEventListener("click", function() {
-		msgboxboxPersistent.show("Hello! I am a persistent message box! I will hide myself if you close me.");
-	});
+	// Only add event listeners if buttons exist
+	if (msgboxShowMessage) {
+		msgboxShowMessage.addEventListener("click", function() {
+			msgboxbox.show("Hello! I am a message box! I will close myself after 10 seconds.");
+		});
+	}
 
-	// Show the message at the beginning
-	msgboxboxPersistent.show(
-			"Hello! I am a message box! I will appear on the page load period. I also have a callback. You may check on 'Console' to see.",
-			"CALLBACK", () => {
-				console.log("I am the callback! Of course, you may add various javascript codes to make the callback function colourful.");
-			});
+	if (msgboxHiddenClose) {
+		msgboxHiddenClose.addEventListener("click", function() {
+			msgboxNoClose.show("Hello! I am a message box! I will close myself after 5 seconds, and I do not have a close button.");
+		});
+	}
+
+	const msgboxPersistentBtn = document.querySelector("#msgboxPersistent");
+	if (msgboxPersistentBtn) {
+		msgboxPersistentBtn.addEventListener("click", function() {
+			msgboxboxPersistent.show("Hello! I am a persistent message box! I will hide myself if you close me.");
+		});
+	}
+
+	// Show the message at the beginning - only if msgbox-area exists
+	const msgboxArea = document.querySelector("#msgbox-area");
+	if (msgboxArea) {
+		msgboxboxPersistent.show(
+				"Hello! I am a message box! I will appear on the page load period. I also have a callback. You may check on 'Console' to see.",
+				"CALLBACK", () => {
+					console.log("I am the callback! Of course, you may add various javascript codes to make the callback function colourful.");
+				});
+	}
 </script>
 
 <script>
 	let sandboxSwitch = '{{session.sandbox_info.sandbox_email_check}}'
 	if(sandboxSwitch == 'true'){
-		msgboxboxPersistent.show(
-				"Email sandbox is on, all the email will goes to sandbox email. This should only be on in development",
-				"close", () => {
-					console.log("alert closed");
-				});
+		const msgboxArea = document.querySelector("#msgbox-area");
+		if (msgboxArea) {
+			msgboxboxPersistent.show(
+					"Email sandbox is on, all the email will goes to sandbox email. This should only be on in development",
+					"close", () => {
+						console.log("alert closed");
+					});
+		}
 	}
 </script>

@@ -1098,7 +1098,35 @@ div#cstForlaHeight .fr-box {
                     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
                     initialCountry: "us",
                 });
-                phoneInputField.iti = iti; 
+                phoneInputField.iti = iti;
             });
+    });
+</script>
+
+<script>
+    // Initialize flatpickr for event dates (matching reference implementation)
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr("#inline-datepicker", {
+                dateFormat: "Y-m-d",
+                allowInput: true,
+                inline: true
+            });
+
+            // Initialize time pickers for start and end times
+            flatpickr("#event_star_time\\[0\\]", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: false
+            });
+
+            flatpickr("#event_end_time\\[0\\]", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: false
+            });
+        }
     });
 </script>
