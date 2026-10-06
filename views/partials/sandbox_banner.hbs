@@ -1,0 +1,268 @@
+<style>
+	@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700");
+	/*****************************/
+	/* MESSAGE BOX RELATED CLASS */
+	/*          (START)          */
+	/*****************************/
+	.msgbox-area {
+		max-height: 100%;
+		position: fixed;
+		bottom: 15px;
+		left: 20px;
+		right: 20px;
+		z-index: 100000;
+	}
+	.msgbox-area .msgbox-box {
+		font-size: inherit;
+		color: #ffffff;
+		background-color: #0579b8;
+		padding: 18px 20px;
+		margin: 0 0 15px;
+		display: flex;
+		align-items: center;
+		position: relative;
+		border-radius: 12px;
+		box-shadow: 0 10px 15px rgba(0, 0, 0, 0.65);
+		transition: opacity 300ms ease-in;
+	}
+	.msgbox-area .msgbox-box.msgbox-box-hide {
+		opacity: 0;
+	}
+	.msgbox-area .msgbox-box:last-child {
+		margin: 0;
+	}
+	.msgbox-area .msgbox-content {
+		flex-shrink: 1;
+		line-height: 1.2;
+	}
+	.msgbox-area .msgbox-close {
+		color: #ffffff;
+		font-weight: bold;
+		text-decoration: none;
+		margin: 0 0 0 20px;
+		flex-grow: 0;
+		flex-shrink: 0;
+		position: relative;
+		transition: text-shadow 225ms ease-out;
+	}
+	.msgbox-area .msgbox-close:hover {
+		text-shadow: 0 0 3px #efefef;
+	}
+
+	@media (min-width: 481px) and (max-width: 767px) {
+		.msgbox-area {
+			left: 80px;
+			right: 80px;
+		}
+	}
+	@media (min-width: 768px) {
+		.msgbox-area {
+			width: 480px;
+			height: 0;
+			top: 15px;
+			left: auto;
+			right: 15px;
+		}
+	}
+	/*****************************/
+	/* MESSAGE BOX RELATED CLASS */
+	/*           (END)           */
+	/*****************************/
+	body {
+		font-family: "Open Sans", sans-serif;
+	}
+
+	.msgbox-area {
+		font-size: 16px;
+	}
+
+	.msgbox-message-container {
+		text-align: center;
+		width: 100vw;
+		height: 100vh;
+		padding: 20px;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+	}
+	.msgbox-message-container h1,
+	.msgbox-message-container h3 {
+		margin: 10px 20px;
+	}
+	.msgbox-message-container p {
+		margin: 5px 20px;
+	}
+
+	.msgbox-message-button {
+		font-size: 18px;
+		font-weight: bold;
+		font-family: inherit;
+		color: white;
+		background-color: #1476ff;
+		width: 250px;
+		border: solid 2px #005de0;
+		padding: 10px 20px;
+		cursor: pointer;
+		outline: none;
+		box-shadow: 0 5px #005de0;
+		transition: background-color 100ms ease-out, box-shadow 100ms ease-out, transform 100ms ease-out;
+	}
+	.msgbox-message-button:hover, .msgbox-message-button:focus, .msgbox-message-button:active {
+		background-color: #2e85ff;
+	}
+	.msgbox-message-button:active {
+		background-color: #0068fa;
+		box-shadow: 0 0 #005de0;
+		transform: translateY(5px);
+	}
+</style>
+
+<div id="msgbox-area" class="msgbox-area"></div>
+
+<script>
+	class MessageBox {
+		constructor(id, option) {
+			this.id = id;
+			this.option = option;
+		}
+
+		show(msg, label = "CLOSE", callback = null) {
+			if (this.id === null || typeof this.id === "undefined") {
+				// if the ID is not set or if the ID is undefined
+
+				throw "Please set the 'ID' of the message box container.";
+			}
+
+			if (msg === "" || typeof msg === "undefined" || msg === null) {
+				// If the 'msg' parameter is not set, throw an error
+
+				throw "The 'msg' parameter is empty.";
+			}
+
+			if (typeof label === "undefined" || label === null) {
+				// Of the label is undefined, or if it is null
+
+				label = "CLOSE";
+			}
+
+			let option = this.option;
+
+			let msgboxArea = document.querySelector(this.id);
+			let msgboxBox = document.createElement("DIV");
+			let msgboxContent = document.createElement("DIV");
+			let msgboxClose = document.createElement("A");
+
+			if (msgboxArea === null) {
+				// If there is no Message Box container found.
+
+				throw "The Message Box container is not found.";
+			}
+
+			// Content area of the message box
+			msgboxContent.classList.add("msgbox-content");
+			msgboxContent.innerText = msg;
+
+			// Close burtton of the message box
+			msgboxClose.classList.add("msgbox-close");
+			msgboxClose.setAttribute("href", "#");
+			msgboxClose.innerText = label;
+
+			// Container of the Message Box element
+			msgboxBox.classList.add("msgbox-box");
+			msgboxBox.appendChild(msgboxContent);
+
+			if (option.hideCloseButton === false
+					|| typeof option.hideCloseButton === "undefined") {
+				// If the hideCloseButton flag is false, or if it is undefined
+
+				// Append the close button to the container
+				msgboxBox.appendChild(msgboxClose);
+			}
+
+			msgboxArea.appendChild(msgboxBox);
+
+			msgboxClose.addEventListener("click", (evt) => {
+				evt.preventDefault();
+
+				if (msgboxBox.classList.contains("msgbox-box-hide")) {
+					// If the message box already have 'msgbox-box-hide' class
+					// This is to avoid the appearance of exception if the close
+					// button is clicked multiple times or clicked while hiding.
+
+					return;
+				}
+
+				this.hide(msgboxBox, callback);
+			});
+
+			if (option.closeTime > 0) {
+				this.msgboxTimeout = setTimeout(() => {
+					this.hide(msgboxBox, callback);
+				}, option.closeTime);
+			}
+		}
+
+		hide(msgboxBox, callback) {
+			if (msgboxBox !== null) {
+				// If the Message Box is not yet closed
+
+				msgboxBox.classList.add("msgbox-box-hide");
+			}
+
+			msgboxBox.addEventListener("transitionend", () => {
+				if (msgboxBox !== null) {
+					// If the Message Box is not yet closed
+
+					msgboxBox.parentNode.removeChild(msgboxBox);
+
+					clearTimeout(this.msgboxTimeout);
+
+					if (callback !== null) {
+						// If the callback parameter is not null
+						callback();
+					}
+				}
+			});
+		}
+	}
+
+	let msgboxShowMessage = document.querySelector("#msgboxShowMessage");
+	let msgboxHiddenClose = document.querySelector("#msgboxHiddenClose");
+
+	// Creation of Message Box class, and the sample usage
+	let msgboxbox = new MessageBox("#msgbox-area", {
+		closeTime: 10000,
+		hideCloseButton: false
+	});
+	let msgboxboxPersistent = new MessageBox("#msgbox-area", {
+		closeTime: 0
+	});
+	let msgboxNoClose = new MessageBox("#msgbox-area", {
+		closeTime: 5000,
+		hideCloseButton: true
+	});
+
+	document.querySelector("#msgboxPersistent").addEventListener("click", function() {
+		msgboxboxPersistent.show("Hello! I am a persistent message box! I will hide myself if you close me.");
+	});
+
+	// Show the message at the beginning
+	msgboxboxPersistent.show(
+			"Hello! I am a message box! I will appear on the page load period. I also have a callback. You may check on 'Console' to see.",
+			"CALLBACK", () => {
+				console.log("I am the callback! Of course, you may add various javascript codes to make the callback function colourful.");
+			});
+</script>
+
+<script>
+	let sandboxSwitch = '{{session.sandbox_info.sandbox_email_check}}'
+	if(sandboxSwitch == 'true'){
+		msgboxboxPersistent.show(
+				"Email sandbox is on, all the email will goes to sandbox email. This should only be on in development",
+				"close", () => {
+					console.log("alert closed");
+				});
+	}
+</script>

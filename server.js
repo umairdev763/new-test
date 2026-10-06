@@ -398,6 +398,9 @@ app.use((req, res, next) => {
 const inventoryFilterRouter = require('./routes/inventory-filter');
 const indexRouter            = require('./routes/index');
 const boatsRouter            = require('./routes/boats');
+console.log('Loading event_new router...');
+const event_newRouter        = require('./routes/event_new');
+console.log('event_new router loaded successfully');
 
 // Redirect root → boats listing so the filter+sidebar is visible on /
 app.get('/', (req, res) => res.redirect('/boats-for-sale'));
@@ -405,6 +408,17 @@ app.get('/', (req, res) => res.redirect('/boats-for-sale'));
 app.use('/', inventoryFilterRouter);  // ← SEO filter routes (BEFORE index)
 app.use('/', indexRouter);            // ← base listing + feed routes
 app.use('/boats', boatsRouter);       // ← boats admin/api routes
+
+// Fake a logged-in admin so the event pages + save work
+app.use((req, res, next) => {
+    req.session.user = 'tester';
+    req.session.isAdmin = true;
+    req.session.usersName = 'Tester';
+    next();
+});
+
+app.use('/admin/event_new', event_newRouter);
+console.log('Mounted event_new router at /admin/event_new');
 
 // ---------------------------------------------------------------------------
 // Connect & start

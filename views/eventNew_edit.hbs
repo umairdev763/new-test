@@ -1,0 +1,1244 @@
+{{> partials/hyper_menu}}
+{{> partials/sandbox_banner}}
+<style>
+    input[name="inventory"],
+    input[name="websiteToShow"] {
+        display: none;
+    }
+
+    fieldset {
+        border: none;
+        position: relative;
+    }
+    .category-item {
+    display: flex;
+    margin: 10px 0px;
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+}
+  .drop-zone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+    fieldset>label,
+    fieldset>.boatLabel {
+        display: inline-block;
+        width: 100px;
+        font-weight: bold;
+        vertical-align: top;
+        font-size: 1rem;
+        line-height: 28px;
+    }
+    a.remove-category.text-danger {
+    font-size: 15px;
+    font-weight: 500;
+ }
+     .upload-button {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.upload-button:hover {
+    color: #0056b3;
+}
+
+    fieldset>label::after,
+    fieldset>.boatLabel::after {
+        content: ":";
+    }
+
+    details {
+        display: inline-block;
+        width: 100%;
+        max-width: 400px;
+        background-color: white;
+        cursor: pointer;
+        position: relative;
+    }
+
+    details summary {
+        border: 2px solid #dce4ec;
+        border-collapse: collapse;
+        border-radius: 4px;
+        padding: 10px;
+        height: 46px;
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .BrandinerWrap {
+        border: 2px solid #7cafbd;
+        padding: 4px;
+        margin: 10px 0;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    details[open]>summary::marker {
+        color: blue;
+    }
+
+    details summary:focus,
+    details summary:active {
+        box-shadow: 0 0 5px 1px blue;
+    }
+
+    details ul {
+        list-style: none;
+        margin: 0px;
+        padding: 8px;
+        margin-top: 2px;
+        border: 1px solid grey;
+        box-shadow: 0 0 5px 1px #000;
+        max-height: 200px;
+        overflow: auto;
+        position: absolute;
+        bottom: 100%;
+        z-index: 99999;
+        background: #fff;
+        width: 100%;
+    }
+
+    details li {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    details li>label,
+    details li>.boatLabel {
+        cursor: pointer;
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 6px;
+        padding: 5px;
+
+        border-bottom: 1px solid;
+    }
+
+    details li>label:hover,
+    details li>label:has(input:checked) {
+        background-color: grey;
+        color: white;
+    }
+
+    details li>.boatLabel:hover,
+    details li>.boatLabel:has(input:checked) {
+        background-color: grey;
+        color: white;
+    }
+
+    input#myInput {
+        position: absolute;
+        left: 0;
+        top: 0;
+        max-width: 400px;
+    }
+
+    #myDropdown>span {
+        background: #e74c3c;
+        padding: 3px;
+        width: 35px;
+        height: 30px;
+        text-align: center;
+        vertical-align: middle;
+        border-bottom-left-radius: 7px;
+        /* border-radius: 50%; */
+        display: inline-flex;
+        border: 1px solid #ff1e07;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        right: 0px;
+        top: 0;
+        color: #fff;
+    }
+
+    .modelOuterWraper {
+        margin-bottom: 50px;
+    }
+
+    .filterBoatsWrap {
+        display: flex;
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__choice__remove{
+    position: static;
+    color: #fff;
+    border-color: #fff;
+    background: #f75d7c !important;
+}
+
+    .filterBoatsList {
+        margin-left: 50px;
+        display: flex;
+        flex-wrap: wrap;
+        flex: 0 0 calc(100% - 450px);
+    }
+
+    .filterBoatsList>span {
+        border: 1px solid #7cafbd;
+        padding: 8px 12px;
+        border-radius: 20px;
+        position: relative;
+        margin: 5px;
+    }
+
+    .filterBoatsList>span+span {}
+
+    .filterBoatsList>span .fa-close {
+        padding: 6px 8px;
+        margin-left: 10px;
+        background: #e74c3c;
+        color: #fff;
+        font-size: 12px;
+        border-radius: 16px;
+        cursor: pointer;
+    }
+
+    .btnWrp {
+        position: relative;
+    }
+
+    .btnprmry {
+        background: #106e88;
+        color: #fff;
+        border-radius: 20px;
+        padding: 5px 20px;
+        border: 1px solid transparent;
+        display: block;
+    }
+
+    .btnWrp .imgupld {
+        position: absolute;
+        top: 0px;
+        left: 2px;
+        width: 105px;
+        padding: 5px;
+        opacity: 0;
+    }
+
+    .imageThumb {
+        border: 2px solid;
+        padding: 1px;
+        cursor: pointer;
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+    }
+
+    .pip {
+        display: inline-block;
+        margin: 10px 10px 0 0;
+        width: 100px;
+        height: 100px;
+        position: relative;
+    }
+
+    .singleImg {
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .singleImg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove {
+        right: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #444;
+        border: 1px solid black;
+        color: white;
+        text-align: center;
+        position: absolute;
+        top: 5px;
+        border-radius: 50%;
+        height: 20px;
+        width: 20px;
+        cursor: pointer;
+    }
+
+    .remove:hover {
+        background: white;
+        color: black;
+    }
+
+
+
+    .cstmField input::placeholder{
+        {{!-- color: #000; --}}
+    }
+    .cstmField input:focus, .cstmField textarea:focus, .cstmField textarea:focus-visible{
+        border: 1px solid #c3c3c3;
+        outline: none;
+    }
+    .cstmField select option{
+        max-height: 100vh;
+        overflow-y: auto;
+        width: 100%;
+    }
+     .cstmField select{
+        max-height: 300px;
+        width: 100%;
+    }
+
+  .cstmLabel{
+    /* color: #3b3f5c; */
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .cstmField input:not([type='checkbox'], [type='radio']), .cstmField select, .cstmField textarea {
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 14px;
+    height: 50px;
+    border: 1px solid #c7c7c7;
+    -webkit-box-shadow: 0 0 0 0 rgb(31 45 61 / 10%);
+    box-shadow: 0 0 0 0 rgb(31 45 61 / 10%);
+    transition: 0.4s ease all;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .cstmField select, .cstmField textarea {
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 18px;
+    height: 50px;
+    border: 1px solid #c7c7c7;
+    -webkit-box-shadow: 0 0 0 0 rgb(31 45 61 / 10%);
+    box-shadow: 0 0 0 0 rgb(31 45 61 / 10%);
+    transition: 0.4s ease all;
+    width: 100%;
+    {{!-- color: #000000; --}}
+  }
+  
+  .cstmField textarea {
+    height: auto;
+    resize: none;   
+  }
+  .cstmField input::placeholder{
+      font-size: 16px;
+      font-weight: 400;
+      {{!-- color: #000000; --}}
+  }
+  .cstmField textarea::placeholder{
+    {{!-- color: #000000; --}}
+  }
+  .cstmTab{
+    border: 1px solid #c7c7c7;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 18px;
+  }
+  .tabHed{
+    padding: 12px;
+    border-bottom:1px solid #c7c7c7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+.tabHed .cstmLabel{
+    font-weight: 900;
+    font-size: 18px;
+    color: #727cf5;
+}
+.tabBody{
+    padding: 12px;
+}
+.closed .tabBody{
+    display: none;
+}
+.cstmTab .cstmField input , .cstmTab .cstmField textarea{
+    border: none;
+}
+.tabArow {
+    font-size: 20px;
+    display: inline-block;
+    padding: 0px 20px;
+    cursor: pointer;
+    transition:ease-in-out .3s
+}
+.tabClpsed .tabArow {
+    transform: rotate(180deg);
+}
+.cstmBtn {
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 16px;
+    border-radius: 4px;
+    text-align: center;
+    margin: 5px;
+    width: 100%;
+    min-width: 120px;
+}
+
+.cstmBtn + .cstmBtn {
+    margin-left: 10px;
+}
+
+a {
+    color: inherit;
+}
+.btnGrop {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.tabFoot{
+    border-top:1px solid #c7c7c7;
+    padding: 12px;
+}
+.btnWrap{
+     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.postLinks{
+    position: relative;
+}
+.postOptn{
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+}
+select.postOptn{
+    width: 110px;
+}
+.postLinks > span, .postLinks > strong , .postLinks > a{
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.acordinHead {
+    display: flex;
+    justify-content: space-between;
+    /* flex-wrap: wrap;*/
+    /* margin-bottom: 20px; */
+    border: 1px solid;
+}
+.accrdinBtn {
+    flex: 0 0 50%;
+    padding: 10px;
+    width: 50%;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+}
+.acordinBody {
+    border: 1px solid;
+    border-top: 0;
+    padding: 15px 15px 0px 15px;
+    margin-bottom: 20px;
+    overflow-y: auto;
+}
+.checkmark {
+    height: 20px !important;
+    width: 20px !important;
+}
+
+/* Customize scrollbar track */
+.acordinBody::-webkit-scrollbar {
+    width: 5px;
+}
+
+.acordinBody::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.acordinBody::-webkit-scrollbar-thumb {
+    background: #c0bbbb;
+    border-radius: 5px; 
+}
+
+.acordinBody::-webkit-scrollbar-thumb:hover {
+    background: #c0bbbb;
+}
+.accrdinBtn + .accrdinBtn{
+    border-left: 1px solid;
+}
+.acordinList{
+    display: none;
+}
+.acordinList.showAcordin{
+    display: block;
+}
+/* Custom Check Box style */
+.chk_box_cstm {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 100;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default checkbox */
+  .chk_box_cstm input {
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee !important;
+    border:1px solid #8080809e;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .chk_box_cstm:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the checkbox is checked, add a blue background */
+  .chk_box_cstm input:checked ~ .checkmark {
+    background-color: #2196F3;
+  }
+  
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .chk_box_cstm input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the checkmark/indicator */
+  .chk_box_cstm .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid #006e87;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  .imgSlct{
+    position: relative;
+  }
+  .imgSlct input{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    height: 100%;
+  }
+  .imgWrp {
+    height: 150px;
+    background: #d0d2d1;
+    text-align: center;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 20px;
+    font-size: 26px;
+}
+.imgWrp>img[src]:not([src=""]){
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.imgWrp>img[src]:not([src=""]) + span{
+    display: none;
+}
+input#postDate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    /* z-index: -1; */
+    opacity: 0;
+    width: 30px;
+    height: 20px;
+}
+#showPostDate{
+    position: relative;
+    {{!-- background-color: #fff; --}}
+}
+.row.resTab {
+    margin-left: 30px;
+    display: none;
+    /* background: #fff; */
+}
+#title_result_list p {
+    cursor: pointer;
+}
+#cstForlaHeight .fr-view {
+    min-height: 360px;
+}
+#metaTitle {
+    {{!-- color: #000000; --}}
+    font-size: 18px;
+}
+.cardsWrap {
+    display: flex;
+  justify-content: space-around;
+    flex-wrap: wrap;
+}
+.snglCrd {
+    max-width: 500px;
+        min-width: 300px;
+    border: 1px solid;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px;
+        flex: 0 0 calc((100% / 2) - 20px);
+}
+.crdImg > img {
+    width: 100%;
+}
+.scInr {
+    padding: 12px;
+}
+
+.crdImg {
+    border: 1px solid;
+    margin-bottom: 20px;
+}
+
+.crdCntnt {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+div#cstForlaHeight .fr-box {
+    flex: 0 0 calc(100% - 43px) !important;
+}
+
+.customBorderRadius{
+    border-radius: 10px;
+}
+/* Custom Check box style end */
+
+@media screen and (max-width: 1785px) {
+    .cstmBtn {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 1600px) {
+    .cstmBtn {
+        padding: 6px 16px;
+        font-size: 18px;
+        width: 100%;
+    }
+    .cstmBtn + .cstmBtn {
+    margin-left: 5px;
+}
+}
+@media screen and (max-width: 1500px) {
+    .accrdinBtn {
+        font-size: 16px;
+    }
+    .cstmTab {
+        font-size: 16px;
+    }
+    .cstmField select, .cstmField textarea {
+        font-size: 16px;
+    }
+}
+
+</style>
+<div class="content-page">
+    <div class="col-md-12 main_content">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <form method="post" class="form-horizontal" id="insert_form" action="/admin/event_new/update"
+                    data-toggle="validator" enctype="multipart/form-data">
+                         <input type="hidden" name="frmboatId" id="frmboatId" value="{{result._id}}" />
+                         <input type="hidden" name="senderId" id="senderId" value="" />
+                    <div class="row">
+                        <div class="col-lg-9">
+                          <div class="d-flex card-header justify-content-between align-items-center">
+                        <h4 class="header-title">Edit Event</h4>
+                        {{!-- <button id="frm_edit_employment_save" class="btn btn-primary" type="submit">Add Event
+                        </button> --}}
+
+                    </div>
+
+                    <div class="card-body pt-0">
+                        <div class="form-group mb-3">
+
+                            <div class="col-sm-12 mb-3">
+                                <label class="form-label" for="eventTitle">Banner Title *</label>
+                                <input type="text" name="eventTitle" id="eventTitle" class="form-control" minlength="1"
+                                    maxlength="200" value="{{result.eventTitle}}" required />
+                            </div>
+                            <div class="col-sm-12 mb-3">
+                                <label class="form-label" for="eventSlug">Event URL*</label>
+                                <input type="text" name="eventSlug" id="eventSlug" class="form-control" minlength="1"
+                                    maxlength="200" value="{{result.eventSlug}}" required readonly />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="col-sm-12">
+                                <label class="form-label" for="metaTitle">Meta Title *</label>
+                                <input type="text" name="metaTitle" id="metaTitle" class="form-control"
+                                    value="{{result.metaTitle}}" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+
+                            <div class="col-sm-12">
+                                <label class="form-label" for="metaDesc">Meta Description *</label>
+                                <textarea name="metaDesc" id="metaDesc" class="form-control customBorderRadius" cols="30"
+                                    rows="5">{{result.metaDesc}}</textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="col-sm-12">
+                                <label for="metaDesc" class="form-label">Excerpt</label>
+                                <textarea name="Excerpt" id="Excerpt" class="form-control customBorderRadius" cols="30" rows="5"
+                                    maxlength="250">{{result.Excerpt}}</textarea>
+                            </div>
+                        </div>
+                      
+
+
+                        <div class="form-group mb-3">
+                            <label for="eventDesc" class="col-sm-2 control-label form-label">Description</label>
+                            <div class="col-sm-12">
+                                <textarea name="eventDesc" id="eventDesc" class="form-control" cols="30" rows="10"
+                                    required>{{result.eventDesc}}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="" class="col-sm-2 control-label form-label">Inventory Section Title</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="invTitle" placeholder="" name="invTitle"
+                                    value="{{result.invTitle}}">
+                            </div>
+                        </div>
+                          <div class="mb-3">
+                            <label for="" class="col-sm-12 form-label">Select Boat(s) to Show on Event</label>
+                            <div class="col-sm-12">
+                                <select multiple id="multiSelct" class="from-select" name="inventory"
+                                    placeholder="Select Boats To Show" style="width: 100%;">
+                                    {{#each inventoryData}}
+                                    <option value="{{this.calleriq_boat_id}}" {{#if ../inventory}} {{{checkInventory
+                                        ../inventory this.calleriq_boat_id}}} {{else}}{{/if}}>{{this.boatTitle}} -
+                                        Stock#{{this.stock_number}}
+                                    </option>
+                                    {{/each}}
+                                    {{#each inventory}}
+                                    <option selected value="{{this.calleriq_boat_id}}">{{this.boatTitle}} -
+                                        Stock#{{this.stockNumber}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                      
+                        <div class="form-group dateOuterwrap">
+                            <label id="chngeTxt" for="" class="col-sm-2 control-label">{{#if result.promotion}}{{#ifCond
+                                result.promotion "==" "Yes"}}Offer Valid Until{{else}}
+                               {{/ifCond}}{{else}}Event
+                                Dates{{/if}}</label>
+                            <div class="col-sm-10 dateWraper">
+                                <input type="hidden" class="form-control" id="event_date_length" placeholder=""
+                                    name="event_date_length" required value="{{result.events.length}}">
+                                {{#if result.events}}
+                                {{#each result.events}}
+                                <div class="row dateadd_wrap">
+                                    <div class="col-sm-3">
+                                        <label for="" class="control-label form-label">Event Date</label>
+                                        {{!-- <input type="date" class="form-control" id="event_start_date[0]" placeholder="" name="event_start_date[]" required value="{{this.eventDate}}"> --}}
+                                     <input type="text" id="inline-datepicker" name="event_start_date[]" class="form-control flatpickr-input" placeholder="Inline calendar" value="{{this.eventDate}}">
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label for="" class="control-label form-label">Event Start Time</label>
+                                        <input type="text" class="form-control" id="event_star_time[0]" placeholder=""
+                                            name="event_star_time[]" required value="{{this.eventTimeStart}}">
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label for="" class="control-label form-label">Event End Time</label>
+                                        <input type="text" class="form-control" id="event_end_time[0]" placeholder=""
+                                            name="event_end_time[]" required value="{{this.eventTimeEnd}}">
+                                    </div>
+                                    <div class="col-sm-3 text-right">
+                                        <label for="" class="control-label form-label">Delete Date</label>
+                                        <div class="">
+                                            <button class="text-primry btn btn-sm btn-danger deleteDate"
+                                                type="button">Delete</i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{/each}}
+                                {{/if}}
+                            </div>
+                            <div class="col-sm-2 col-sm-offset-6 " style="margin-top:20px;">
+                                <button id="addDate" type="button" data-count="{{result.events.length}}"
+                                    class="btn btn-sm btn-primary">Add Date</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 mt-4">
+                            <label for="" class="col-sm-2 form-label">LOCATION</label>
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="" class="form-label"> Name</label>
+                                    <input type="text" class="form-control" id="locname" placeholder="" name="locname"
+                                        value="{{result.locname}}">
+                                </div>
+
+
+                                <div class="col-sm-6 mb-3">
+                                    <label for="" class="form-label">Street</label>
+                                    <input type="text" class="form-control" id="street" placeholder="" name="street"
+                                        value="{{result.street}}">
+                                </div>
+
+                                <div class="col-sm-6 mb-3">
+                                    <label for="" class=" form-label">City</label>
+                                    <input type="text" class="form-control" id="city" placeholder="" name="city"
+                                        value="{{result.city}}">
+                                </div>
+
+
+                                <div class="col-sm-6 mb-3">
+                                    <label for="" class=" form-label">State</label>
+                                    <input type="text" class="form-control" id="state" placeholder="" name="state"
+                                        value="{{result.state}}">
+                                </div>
+
+
+                                <div class="col-sm-6">
+                                    <label for="" class=" form-label">Zipcode</label>
+                                    <input type="text" class="form-control" id="zipcode" placeholder="" name="zipcode"
+                                        value="{{result.zipcode}}">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="" class=" form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" placeholder="" name="phone"
+                                        value="{{result.phone}}">
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        
+                        <div class="form-group mb-3">
+                            <label for="" class="col-sm-2 control-label form-label">Form Button Title</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="btnTitle" placeholder="" name="btnTitle"
+                                    value="{{result.btnTitle}}">
+                            </div>
+                        </div>
+                      
+
+                        <div class="row d-flex justify-content-center mt-100">
+                            <div class="col-md-6">
+
+                            </div>
+                        </div>
+                      
+                        
+
+                    </div>
+
+                        </div>
+                          <div class="col-lg-3">
+                                            <div class="sideBar">  
+                                            <!-- Hidden Status Field -->
+                                            <input type="hidden" name="Status" id="Status" value="">
+
+                                            <!-- Publish Section -->
+                                            <div class="cstmTab mt-4">
+                                                <div class="tabHed">
+                                                    <label class="cstmLabel" for="">Publish</label> 
+                                                    <span class="tabArow"><i class='fas fa-caret-up'></i></span>
+                                                </div>
+                                                <div class="tabBody">
+                                                  <div class="btnGrop">
+                                                    
+                                                            {{!-- <button class="cstmBtn statusBtn btn btn-primary">{{#ifCond result.event_status '==' 'Publish'}}Change To Draft{{else}}Save Draft{{/ifCond}}</button> --}}
+                                                            {{!-- <button class="cstmBtn btn btn-primary"><a href="/blog/{{result.newsPermalink}}" target="_blank">Preview</a></button> --}}
+                                                            {{!-- <button class="cstmBtn"><a href="/blog/{{encodeURIParam result.newsPermalink}}" target="_blank">Preview</a></button> --}}
+                                                        </div>
+                                                   <span>Status:</span><strong id="setOptn">{{result.event_status}}</strong>
+                                                    <input type="hidden" name="event_status" id="event_status" value="{{result.event_status}}">
+                                                                <select name="" id="" class="postOptn form-select">
+                                                                    <option value="Draft">Draft</option>
+                                                                    <option value="Publish">Publish</option>
+                                                                </select>
+                                                    <div class="my-1">
+                                                       
+                                                        <div class="postLinks">
+                                                            <span>Publish:</span><strong id="setPostDate">Immediatly</strong>
+                                                            <a class="prmrytxt" id="showPostDate" href="javascript:(void)">Edit <input id="postDate" type="datetime-local" name="publish_date"></a>
+                                                        </div>
+                                                    </div>
+                                                  
+                                                    <div class="btnWrap">
+                                                         <button type="button" class="cstmBtn btnPrmry statusBtn btn btn-primary" data-status="Publish">Publish</button>
+                                                        <button type="button" class="cstmBtn btnPrmry statusBtn btn btn-danger" data-status="Draft">Draft</button>
+                                                        <button type="button" class="cstmBtn btnPrmry statusBtn btn btn-danger" data-status="Trash">Move To Trash</button>
+                                                        <button type="button" class="cstmBtn btnPrmry statusBtn btn btn-primary" data-status="Complete">Complete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Featured Image Section -->
+                                             <div class="cstmTab">
+                                                    <div class="tabHed">
+                                                        <label class="cstmLabel" for="">Categories</label> <span class="tabArow"><i class='fas fa-caret-up'></i></span>
+                                                    </div>
+                                                    <div class="tabBody">
+                                                        <div class="cstAcordin">
+                                                            <div class="acordinHead">
+                                                                <div class="accrdinBtn prmrytxt" tab-id="all-Category">
+                                                                    All Categories
+                                                                </div>
+                                                                <div class="accrdinBtn" tab-id="mostUsed-Category">
+                                                                    Most Used Categories
+                                                                </div>
+                                                            </div>
+                                                            <div class="acordinBody">
+                                                               <div id="all-Category" class="acordinList showAcordin">
+                                                            <div id="all-Category" class="acordinList showAcordin">
+                                                                    <div class="cstmField" id="allCatgryList">
+                                                                        {{#each allCategories}}
+                                                                            <div class="category-item">
+                                                                                <label class="chk_box_cstm">
+                                                                                    {{this.events_category}}
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="subscribe_checkbox"
+                                                                                        value="{{this.events_category}}"
+                                                                                        name="category_val"
+                                                                                        data-id="{{this._id}}"
+
+                                                                                            {{#each ../checkArr}}
+                                                                                             {{#ifCond this "==" ../this.events_category}}checked{{/ifCond}}
+                                                                                              {{/each}}
+                                                                                        {{!-- {{#if (includes ../checkArr this.events_category)}}checked{{/if}} --}}
+                                                                                    >
+                                                                                    <span class="checkmark"></span>
+                                                                                </label>
+                                                                                <a href="javascript:void(0);" class="remove-category text-danger" data-category="{{this.events_category}}" data-id="{{this._id}}">Remove</a>
+                                                                            </div>
+                                                                        {{/each}}
+
+                                                                      
+
+                                                                    </div>
+                                                                </div>
+                                                        </div>
+                                                                <div id="mostUsed-Category" class="acordinList">
+                                                                    <div class="cstmField" id="mostUsedcatgryList">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="">
+                                                            <div class="cstmField">
+                                                                <input type="text" id="newCategory" name="" class="form-control" style="border: 1px solid;" placeholder="Enter New Category">
+                                                            </div>
+                                                            <div class="btnWrap">
+                                                                <a href="javascript:(void)" id="addCategory" class="linkBtn prmrytxt text-primary"><p onclick="eventcategoryFun()">+ Add New Category</p></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                          
+                                       <!-- Featured Image Section -->
+                                        <div class="cstmTab">
+                                            <div class="tabHed">
+                                                <label class="cstmLabel" for="">Featured Image</label> 
+                                                <span class="tabArow"><i class='fas fa-caret-up'></i></span>
+                                            </div>
+                                            <div class="tabBody">
+                                                <div class="imgWrp">
+                                                
+                                                    <img id="imagePreview" src="{{result.hroImage}}" alt="" style="{{#unless result.hroImage}}display: none;{{/unless}}">
+                                                    <span id="placeholderText" style="{{#if result.hroImage}}display: none;{{/if}}">Set Featured Image</span>
+                                                </div>
+                                                <div class="btnWrap">
+                                                
+                                                    {{!-- <button class="cstmBtn btn btn-primary uploadSingImg">Select Image
+                                                        <input id="uploadFile" type="file" class="imgupld" name="heroImg" accept="image/*">
+                                                    </button> --}}
+                                                
+                                                    <a href="javascript:void(0)" id="rmvImg" class="linkBtn cstmBtn btn btn-danger" style="{{#unless result.hroImage}}display: none;{{/unless}}">Remove Image</a>
+                                                </div>
+                                                  <div class="upload-container">
+                                            <div class="drop-zone" id="dropZone">
+                                                <span class="drop-zone__prompt">Drag & Drop your Image here or <span class="upload-button" id="uploadButton">UPLOAD</span></span>
+                                                      <input type="hidden" name="upload_heroimg" id="upload_heroimg" value="{{result.hroImage}}">
+
+                                                <span class="file-name require_check" id="fileName">No file selected *</span>
+                                                <input type="file" style="display: none;" name="heroImg" class="inputField require_check" id="fileInput">
+                                            </div>
+                                        </div>
+                                            </div>
+                                        </div>
+
+
+
+                                            </div>
+                          </div>
+                                      </div>
+               
+                    {{!-- <div class="page-header">
+                        <div class="pull-right">
+
+                            <button class="btn btn-red_cust2 btn-sm btn-primary" type="submit">Update Event <i
+                                    class="fa fa-plus"></i></button>
+                        </div>
+                        <h2>Edit Event</h2>
+                    </div> --}}
+                    
+
+                </form>
+                 <div class="hypertheme-version">
+                            <strong>Version 1.2.0</strong><p></p>
+                        </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/assets/js/froala_editor_new/js/froala_editor.min.js"></script>
+<script type="text/javascript" src="/assets/js/froala_editor_new/js/froala_editor.pkgd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.js"></script>
+<script>
+    var editor = new FroalaEditor('#eventDesc', {
+        key: '{{{config.froalaLicenseKey}}}',
+        imageUploadParam: 'file',
+        imageUploadURL: '/admin/landing_pages/froala-upload-img',
+        imageManagerLoadURL: '/admin/landing_pages/froala-load-s3-images',
+        imageManagerLoadMethod: "POST",
+        imageManagerDeleteURL: '/admin/landing_pages/froala-delete-s3-image',
+    });
+</script>
+<script>
+    function filterFunction() {
+        var input, filter, ul, li, a, i, newDiv;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        div = document.getElementById("myDropdown");
+        a = div.getElementsByClassName("bnam");
+        if (event.code === "Space") {
+            console.log('detailsElement')
+            document.getElementById("my-details").open = true;
+        }
+        for (i = 0; i < a.length; i++) {
+            txtValue = a[i].textContent || a[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+
+                a[i].parentElement.style.display = "";
+            } else {
+                a[i].parentElement.style.display = "none";
+            }
+        }
+    }
+    function openDetail() {
+        document.getElementById("my-details").open = true;
+    }
+    function closeDetail() {
+        document.getElementById("my-details").open = false;
+    }
+
+
+</script>
+
+
+<script>
+    document.querySelectorAll('.statusBtn').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            
+            let newStatus = item.getAttribute('data-status');
+            document.getElementById('event_status').value = newStatus; 
+            document.getElementById('setOptn').textContent = newStatus; 
+            
+            document.getElementById('insert_form').submit();
+        });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imagePreview = document.getElementById('imagePreview');
+    const placeholderText = document.getElementById('placeholderText');
+    const uploadFile = document.getElementById('uploadFile');
+    const rmvImg = document.getElementById('rmvImg');
+    let heroimage=  document.getElementById('upload_heroimg');
+    if (uploadFile) {
+        uploadFile.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    placeholderText.style.display = 'none';
+                    rmvImg.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (rmvImg) {
+        rmvImg.addEventListener('click', function() {
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            placeholderText.style.display = 'block';
+            rmvImg.style.display = 'none';
+            heroimage.value = '';
+        });
+    }
+});
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileName');
+    const uploadButton = document.getElementById('uploadButton');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('drop-zone--over'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('drop-zone--over'), false);
+    });
+
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            updateFileNameDisplay(files[0].name);
+        }
+    }
+
+   
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            updateFileNameDisplay(fileInput.files[0].name);
+        }
+    });
+
+   
+    function updateFileNameDisplay(name) {
+        fileNameDisplay.textContent = name;
+    }
+
+});
+
+    function getIp(callback) {
+ fetch('ipinfo.io/140.82.183.34?token=66e2f39b20a2bd', { headers: { 'Accept': 'application/json' }})
+   .then((resp) => resp.json())
+   .catch(() => {
+     return {
+       country: 'us',
+     };
+   })
+   .then((resp) => callback(resp.country));
+}
+
+ const phoneInputField = document.querySelector("#phone");
+   const phoneInput = window.intlTelInput(phoneInputField, {
+     utilsScript:
+       "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+   });
+
+</script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const socket = io();
+    const editId = "{{result._id}}"
+    const clientId = crypto.randomUUID();
+    document.getElementById('senderId').value = clientId
+
+    const pageId = 'event_edit';
+    
+    // Join this page's room
+    socket.emit('join-page', pageId);
+
+    // Listen for updates specific to this page
+    socket.on('page-alert', (data) => {
+        if (data.senderId === clientId) return;
+        if(data.documentId !== editId) return;
+        if (data.pageId === pageId) {
+            Swal.fire({
+                title: '🔔 Update Available!',
+                text: data.message,
+                icon: 'info',
+
+                showConfirmButton: true,
+                confirmButtonText: 'Refresh Page',
+
+                showCloseButton: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+
+                backdrop: true
+            }).then((result) => {
+                // Refresh only when user clicks confirm
+                if (result.isConfirmed) {
+                    window.location.reload();
+                }
+            });
+        }
+    });
+  
+</script>
